@@ -1,0 +1,120 @@
+modLoader = "javafml"
+loaderVersion = "${neoforge_loader_version_range}"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+displayURL = "https://modrinth.com/mod/create-propulsion"
+logoFile = "icon.png"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
+
+[[mixins]]
+config = "createpropulsion.mixins.json"
+
+[[dependencies.createpropulsion]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "create"
+type = "required"
+versionRange = "[6.0.6,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "createdieselgenerators"
+type = "optional"
+versionRange = "[1.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "createbigcannons"
+type = "optional"
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "tfmg"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "immersiveengineering"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "mekanism"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "mekanismgenerators"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "northstar"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "stellaris"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "computercraft"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "jei"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "sable"
+type = "required"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.createpropulsion]]
+modId = "sablecompanion"
+type = "required"
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"

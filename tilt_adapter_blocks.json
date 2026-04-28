@@ -1,0 +1,727 @@
+{
+  "file": "src/main/resources/assets/createpropulsion/ponder/tilt_adapter.nbt",
+  "size": {
+    "x": 5,
+    "y": 3,
+    "z": 5
+  },
+  "origin_note": "(0,0,0) is minX/minY/minZ corner in schematic-local coordinates",
+  "total_blocks_in_nbt": 33,
+  "total_blocks_emitted": 33,
+  "palette_size": 6,
+  "counts_by_block": {
+    "minecraft:snow_block": 13,
+    "minecraft:white_concrete": 12,
+    "create:andesite_casing": 4,
+    "create:analog_lever": 2,
+    "create:creative_motor": 1,
+    "createpropulsion:tilt_adapter": 1
+  },
+  "blocks": [
+    {
+      "index": 0,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_origin": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_center": {
+        "x": -2.0,
+        "y": -1.0,
+        "z": -2.0
+      }
+    },
+    {
+      "index": 5,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_origin": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_center": {
+        "x": -1.0,
+        "y": -1.0,
+        "z": -2.0
+      }
+    },
+    {
+      "index": 10,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": -2.0
+      }
+    },
+    {
+      "index": 15,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 3,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_origin": {
+        "x": 3,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_center": {
+        "x": 1.0,
+        "y": -1.0,
+        "z": -2.0
+      }
+    },
+    {
+      "index": 20,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 4,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_origin": {
+        "x": 4,
+        "y": 0,
+        "z": 0
+      },
+      "offset_from_center": {
+        "x": 2.0,
+        "y": -1.0,
+        "z": -2.0
+      }
+    },
+    {
+      "index": 1,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_origin": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_center": {
+        "x": -2.0,
+        "y": -1.0,
+        "z": -1.0
+      }
+    },
+    {
+      "index": 6,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 1,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_origin": {
+        "x": 1,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_center": {
+        "x": -1.0,
+        "y": -1.0,
+        "z": -1.0
+      }
+    },
+    {
+      "index": 11,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 2,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": -1.0
+      }
+    },
+    {
+      "index": 16,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 3,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_origin": {
+        "x": 3,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_center": {
+        "x": 1.0,
+        "y": -1.0,
+        "z": -1.0
+      }
+    },
+    {
+      "index": 21,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 4,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_origin": {
+        "x": 4,
+        "y": 0,
+        "z": 1
+      },
+      "offset_from_center": {
+        "x": 2.0,
+        "y": -1.0,
+        "z": -1.0
+      }
+    },
+    {
+      "index": 2,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": -2.0,
+        "y": -1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 7,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 1,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 1,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": -1.0,
+        "y": -1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 12,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 2,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 17,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 3,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 3,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": 1.0,
+        "y": -1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 22,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 4,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 4,
+        "y": 0,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": 2.0,
+        "y": -1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 3,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 0,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_origin": {
+        "x": 0,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_center": {
+        "x": -2.0,
+        "y": -1.0,
+        "z": 1.0
+      }
+    },
+    {
+      "index": 8,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 1,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_origin": {
+        "x": 1,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_center": {
+        "x": -1.0,
+        "y": -1.0,
+        "z": 1.0
+      }
+    },
+    {
+      "index": 13,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 2,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 1.0
+      }
+    },
+    {
+      "index": 18,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 3,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_origin": {
+        "x": 3,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_center": {
+        "x": 1.0,
+        "y": -1.0,
+        "z": 1.0
+      }
+    },
+    {
+      "index": 23,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 4,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_origin": {
+        "x": 4,
+        "y": 0,
+        "z": 3
+      },
+      "offset_from_center": {
+        "x": 2.0,
+        "y": -1.0,
+        "z": 1.0
+      }
+    },
+    {
+      "index": 4,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 0,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_origin": {
+        "x": 0,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_center": {
+        "x": -2.0,
+        "y": -1.0,
+        "z": 2.0
+      }
+    },
+    {
+      "index": 9,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 1,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_origin": {
+        "x": 1,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_center": {
+        "x": -1.0,
+        "y": -1.0,
+        "z": 2.0
+      }
+    },
+    {
+      "index": 14,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 2,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 2.0
+      }
+    },
+    {
+      "index": 19,
+      "name": "minecraft:white_concrete",
+      "properties": {},
+      "state_index": 1,
+      "pos": {
+        "x": 3,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_origin": {
+        "x": 3,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_center": {
+        "x": 1.0,
+        "y": -1.0,
+        "z": 2.0
+      }
+    },
+    {
+      "index": 24,
+      "name": "minecraft:snow_block",
+      "properties": {},
+      "state_index": 0,
+      "pos": {
+        "x": 4,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_origin": {
+        "x": 4,
+        "y": 0,
+        "z": 4
+      },
+      "offset_from_center": {
+        "x": 2.0,
+        "y": -1.0,
+        "z": 2.0
+      }
+    },
+    {
+      "index": 25,
+      "name": "create:andesite_casing",
+      "properties": {},
+      "state_index": 2,
+      "pos": {
+        "x": 1,
+        "y": 1,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 1,
+        "y": 1,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": -1.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 26,
+      "name": "create:andesite_casing",
+      "properties": {},
+      "state_index": 2,
+      "pos": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 28,
+      "name": "create:andesite_casing",
+      "properties": {},
+      "state_index": 2,
+      "pos": {
+        "x": 3,
+        "y": 1,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 3,
+        "y": 1,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 27,
+      "name": "create:andesite_casing",
+      "properties": {},
+      "state_index": 2,
+      "pos": {
+        "x": 2,
+        "y": 1,
+        "z": 3
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 1,
+        "z": 3
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      }
+    },
+    {
+      "index": 29,
+      "name": "create:analog_lever",
+      "properties": {
+        "face": "floor",
+        "facing": "south"
+      },
+      "state_index": 3,
+      "pos": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": -1.0,
+        "y": 1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 30,
+      "name": "createpropulsion:tilt_adapter",
+      "properties": {
+        "aligned_x": "false",
+        "positive": "false",
+        "axis": "z"
+      },
+      "state_index": 4,
+      "pos": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 32,
+      "name": "create:analog_lever",
+      "properties": {
+        "face": "floor",
+        "facing": "south"
+      },
+      "state_index": 3,
+      "pos": {
+        "x": 3,
+        "y": 2,
+        "z": 2
+      },
+      "offset_from_origin": {
+        "x": 3,
+        "y": 2,
+        "z": 2
+      },
+      "offset_from_center": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 0.0
+      }
+    },
+    {
+      "index": 31,
+      "name": "create:creative_motor",
+      "properties": {
+        "facing": "north"
+      },
+      "state_index": 5,
+      "pos": {
+        "x": 2,
+        "y": 2,
+        "z": 3
+      },
+      "offset_from_origin": {
+        "x": 2,
+        "y": 2,
+        "z": 3
+      },
+      "offset_from_center": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 1.0
+      }
+    }
+  ]
+}

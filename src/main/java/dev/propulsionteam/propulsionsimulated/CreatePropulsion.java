@@ -1,0 +1,49 @@
+package dev.propulsionteam.propulsionsimulated;
+
+import dev.propulsionteam.propulsionsimulated.registries.*;
+
+import dev.propulsionteam.propulsionsimulated.compat.computercraft.CCProxy;
+import dev.propulsionteam.propulsionsimulated.events.ModCapabilityEvents;
+import dev.propulsionteam.propulsionsimulated.network.PropulsionPackets;
+import dev.propulsionteam.propulsionsimulated.particles.ParticleTypes;
+import com.simibubi.create.compat.Mods;
+
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+
+@Mod(CreatePropulsion.ID)
+public class CreatePropulsion {
+    public static final String ID = "createpropulsion";
+    private static final String INCOMPATIBLE_MOD_ID = "createpropulsionsimulated";
+
+    public CreatePropulsion(IEventBus modBus, ModContainer modContainer) {
+        if (ModList.get().isLoaded(INCOMPATIBLE_MOD_ID)) {
+            throw new IllegalStateException(
+                    "Create: Propulsion is incompatible with createpropulsionsimulated. "
+                            + "Both mods provide the same features and cannot be loaded together.");
+        }
+        modBus.addListener(ModCapabilityEvents::registerCapabilities);
+        //Content
+        ParticleTypes.register(modBus);
+        PropulsionBlocks.register(modBus);
+        PropulsionBlockEntities.register(modBus);
+        PropulsionItems.register(modBus);
+        PropulsionFluids.register();
+        PropulsionPartialModels.register();
+        PropulsionCreativeTab.register(modBus);
+        PropulsionPackets.register();
+        PropulsionDisplaySources.register();
+        PropulsionSableBridge.init();
+
+        //Compat
+        Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
+
+        //Config
+        modContainer.registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SERVER_SPEC, ID + "-server.toml");
+        modContainer.registerConfig(ModConfig.Type.CLIENT, PropulsionConfig.CLIENT_SPEC, ID + "-client.toml");
+        PropulsionDefaultStress.init(PropulsionConfig.SERVER_SPEC);
+    }
+}

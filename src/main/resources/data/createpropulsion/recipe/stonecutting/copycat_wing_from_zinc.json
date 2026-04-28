@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:stonecutting",
+    "ingredient": {
+        "item": "create:zinc_ingot"
+    },
+    "result": {
+        "id": "createpropulsion:copycat_wing",
+        "count": 4
+    }
+}
