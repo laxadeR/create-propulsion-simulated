@@ -128,6 +128,9 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addThrusterDetails(tooltip, isPlayerSneaking);
+        if (tank == null) {
+            return;
+        }
         containedFluidTooltip(tooltip, isPlayerSneaking, tank.getPrimaryHandler());
     }
 

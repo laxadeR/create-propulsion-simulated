@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 
-import dev.propulsionteam.propulsionsimulated.content.thruster.AbstractThrusterBlockEntity;
 import dev.propulsionteam.propulsionsimulated.content.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
 
@@ -88,6 +87,9 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     }
 
     private IFluidHandler getHandler() throws LuaException {
+        if (blockEntity.isIon()) {
+            throw new LuaException("Ion thruster has no fluid tank");
+        }
         IFluidHandler handler = blockEntity.getFluidHandler(blockEntity.getFacing());
         if (handler == null) throw new LuaException("Fluid tank not available");
         return handler;

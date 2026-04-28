@@ -1,14 +1,12 @@
 package dev.propulsionteam.propulsionsimulated.events;
 
 import dev.propulsionteam.propulsionsimulated.CreatePropulsion;
-import dev.propulsionteam.propulsionsimulated.network.PropulsionPackets;
 import dev.propulsionteam.propulsionsimulated.registries.PropulsionCommands;
 import dev.propulsionteam.propulsionsimulated.registries.PropulsionFluids;
 import dev.propulsionteam.propulsionsimulated.content.thruster.ThrusterFuelManager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,7 +16,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 @SuppressWarnings("removal")
@@ -29,6 +26,11 @@ public class ForgeEvents {
     @SubscribeEvent
     public static void onCommandsRegister(RegisterCommandsEvent event) {
         PropulsionCommands.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void onAddReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new ThrusterFuelManager());
     }
 
     //Turpentine-lava interaction
