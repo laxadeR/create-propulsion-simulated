@@ -4,7 +4,6 @@ import dev.propulsionteam.propulsionsimulated.PropulsionConfig;
 import dev.propulsionteam.propulsionsimulated.compat.PropulsionCompatibility;
 import dev.propulsionteam.propulsionsimulated.compat.computercraft.ComputerBehaviour;
 import dev.propulsionteam.propulsionsimulated.particles.plume.PlumeParticleData;
-import dev.propulsionteam.propulsionsimulated.registries.PropulsionSoundEvents;
 import dev.propulsionteam.propulsionsimulated.utility.GoggleUtils;
 import dev.propulsionteam.propulsionsimulated.utility.math.MathUtility;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
@@ -24,7 +23,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -42,7 +40,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
     protected static final int OBSTRUCTION_LENGTH = 10;
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
     private static final float PARTICLE_VELOCITY = 4;
-    private static final int SOUND_REPLAY_INTERVAL_TICKS = 18;
     
     protected static final float LOWEST_POWER_THRESHOLD = 5.0f / 15.0f;
 
@@ -54,7 +51,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
     //Ticking
     private int currentTick = 0;
     private int clientTick = 0;
-    private int soundTick = 0;
     private float particleSpawnAccumulator = 0.0f;
 
     //CC Peripheral
@@ -158,8 +154,8 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
         if (level.isClientSide) {
             if (shouldEmitParticles()) {
                 emitParticles(level, worldPosition, currentBlockState);
-                playThrusterLoopSound(level, worldPosition);
             }
+            ThrusterSoundHooks.clientTick(this);
             return;
         }
         currentTick++;
@@ -280,25 +276,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
     public int getFuelCapacityMb() { return 0; }
     public boolean validFluid() { return false; }
     public net.neoforged.neoforge.fluids.FluidStack fluidStack() { return net.neoforged.neoforge.fluids.FluidStack.EMPTY; }
-
-    protected void playThrusterLoopSound(Level level, BlockPos pos) {
-        if (soundTick > 0) {
-            soundTick--;
-            return;
-        }
-        float power = java.lang.Math.max(getPower(), LOWEST_POWER_THRESHOLD);
-        level.playLocalSound(
-            pos.getX() + 0.5,
-            pos.getY() + 0.5,
-            pos.getZ() + 0.5,
-            PropulsionSoundEvents.THRUSTER_LOOP.get(),
-            SoundSource.BLOCKS,
-            0.2f + (0.35f * power),
-            0.85f + (0.25f * power),
-            false
-        );
-        soundTick = SOUND_REPLAY_INTERVAL_TICKS;
-    }
 
     @Override
     public BlockEntityPropeller getPropeller() {

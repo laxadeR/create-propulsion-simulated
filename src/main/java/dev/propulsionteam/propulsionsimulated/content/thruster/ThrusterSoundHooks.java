@@ -1,20 +1,19 @@
 package dev.propulsionteam.propulsionsimulated.content.thruster;
 
 import java.lang.reflect.Method;
-import dev.propulsionteam.propulsionsimulated.content.thruster.thruster.ThrusterBlockEntity;
 
 public final class ThrusterSoundHooks {
     private ThrusterSoundHooks() {
     }
 
-    public static void clientTick(final ThrusterBlockEntity blockEntity) {
+    public static void clientTick(final AbstractThrusterBlockEntity blockEntity) {
         if (blockEntity.getLevel() == null || !blockEntity.getLevel().isClientSide()) {
             return;
         }
 
         try {
             final Class<?> controller = Class.forName("dev.createpropulsionsimulated.client.sound.ThrusterLoopSoundController");
-            final Method tickMethod = controller.getMethod("tick", ThrusterBlockEntity.class);
+            final Method tickMethod = controller.getMethod("tick", AbstractThrusterBlockEntity.class);
             tickMethod.invoke(null, blockEntity);
         } catch (final ReflectiveOperationException ignored) {
         }
