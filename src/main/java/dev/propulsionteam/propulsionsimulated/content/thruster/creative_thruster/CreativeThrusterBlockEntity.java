@@ -24,7 +24,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     private CreativeThrusterPowerScrollValueBehaviour powerBehaviour;
 
-    public enum PlumeType { PLASMA, ION, PLUME, NONE }
+    public enum PlumeType {
+        PLASMA, ION, PLUME, NONE
+    }
+
     public PlumeType plumeType = PlumeType.PLASMA;
 
     public CreativeThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -42,7 +45,7 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         powerBehaviour.value = 49;
         powerBehaviour.withCallback(i -> {
             updateThrust(getBlockState());
-            sendData(); 
+            sendData();
         });
         behaviours.add(powerBehaviour);
     }
@@ -51,7 +54,7 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     public void updateThrust(BlockState currentBlockState) {
         float thrust = 0;
         float currentPower = getPower();
-        if (currentPower  > 0) {
+        if (currentPower > 0) {
             float thrustMultiplier = PropulsionConfig.CREATIVE_THRUSTER_THRUST_MULTIPLIER.get().floatValue();
             float powerMultiplier = powerBehaviour.getTargetThrust();
             thrust = thrustMultiplier * currentPower * powerMultiplier;
@@ -61,20 +64,26 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
-    protected boolean isWorking() { return true; }
+    protected boolean isWorking() {
+        return true;
+    }
 
     @Override
-    public boolean isCreative() { return true; }
+    public boolean isCreative() {
+        return true;
+    }
 
     @Override
-    public PlumeType getPlumeType() { return plumeType; }
+    public PlumeType getPlumeType() {
+        return plumeType;
+    }
 
     @Override
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection) {
         this.emptyBlocks = OBSTRUCTION_LENGTH;
     }
 
-    //Particles
+    // Particles
 
     public void cyclePlumeType() {
         int ordinal = plumeType.ordinal() + 1;
@@ -103,11 +112,14 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     @Override
     public boolean shouldEmitParticles() {
-        if (plumeType == PlumeType.NONE) return false;
+        if (plumeType == PlumeType.NONE)
+            return false;
 
-        if (!isPowered()) return false; 
+        if (!isPowered())
+            return false;
         Level level = getLevel();
-        if (level == null) return false;
+        if (level == null)
+            return false;
 
         Direction facing = getBlockState().getValue(CreativeThrusterBlock.FACING);
         BlockPos plumeOccupiedPosition = worldPosition.relative(facing.getOpposite());
@@ -119,7 +131,7 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         if (plumeType == PlumeType.PLASMA) {
             return new PlasmaParticleData();
         }
-        //Default is plume :P
+        // Default is plume :P
         return super.createParticleOptions();
     }
 
@@ -127,23 +139,30 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
         float maxThrustKN = powerBehaviour.getTargetThrust() / 1000.0f;
         float currentPower = getPower();
-        int currentThrustKN = (int)Math.ceil(maxThrustKN * currentPower);
+        int currentThrustKN = (int) Math.ceil(maxThrustKN * currentPower);
 
-        //"Thrust Output: 400/450 kN"
+        // "Thrust Output: 400/450 kN"
         LangBuilder thrustBuilder = CreateLang.builder();
         thrustBuilder.add(Component.translatable("createpropulsion.gui.goggles.thruster.thrust_output")).text(": ");
-        thrustBuilder.add(CreateLang.number(currentThrustKN).text(" / ").add(CreateLang.number(maxThrustKN)).style(ChatFormatting.GRAY));
-        thrustBuilder.space().add(Component.translatable("createpropulsion.gui.goggles.thruster.unit_kn"));
+        thrustBuilder.add(CreateLang.number(currentThrustKN).text(" / ").add(CreateLang.number(maxThrustKN))
+                .style(ChatFormatting.GRAY));
+        thrustBuilder.space().add(Component.translatable("createpropulsion.gui.goggles.thruster.unit_pn"));
         thrustBuilder.forGoggles(tooltip);
 
-        //"Particle: Plasma"
+        // "Particle: Plasma"
         LangBuilder particleBuilder = CreateLang.builder()
-            .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle")).text(": ");
+                .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle")).text(": ");
 
         switch (plumeType) {
-            case PLASMA -> particleBuilder.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plasma")).style(ChatFormatting.AQUA));
-            case PLUME -> particleBuilder.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plume")).style(ChatFormatting.GOLD));
-            case NONE -> particleBuilder.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.none")).style(ChatFormatting.DARK_GRAY));
+            case PLASMA -> particleBuilder.add(CreateLang.builder()
+                    .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plasma"))
+                    .style(ChatFormatting.AQUA));
+            case PLUME -> particleBuilder.add(CreateLang.builder()
+                    .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plume"))
+                    .style(ChatFormatting.GOLD));
+            case NONE -> particleBuilder.add(CreateLang.builder()
+                    .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.none"))
+                    .style(ChatFormatting.DARK_GRAY));
         }
 
         particleBuilder.forGoggles(tooltip);
@@ -152,12 +171,16 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected LangBuilder getGoggleStatus() {
         if (isPowered()) {
-            return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.working")).style(ChatFormatting.GREEN);
+            return CreateLang.builder()
+                    .add(Component.translatable("createpropulsion.gui.goggles.thruster.status.working"))
+                    .style(ChatFormatting.GREEN);
         }
-        return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.not_powered")).style(ChatFormatting.GOLD);
+        return CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.thruster.status.not_powered"))
+                .style(ChatFormatting.GOLD);
     }
 
-    //CC slop
+    // CC slop
 
     public void setThrustConfig(int value) {
         int clamped = Math.max(0, Math.min(value, 99));
@@ -181,16 +204,18 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         return powerBehaviour.getTargetThrust();
     }
 
-    //NBT
+    // NBT
 
     @Override
-    protected void write(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
+    protected void write(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries,
+            boolean clientPacket) {
         super.write(compound, registries, clientPacket);
         compound.putInt("plumeType", plumeType.ordinal());
     }
 
     @Override
-    protected void read(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
+    protected void read(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries,
+            boolean clientPacket) {
         super.read(compound, registries, clientPacket);
         if (compound.contains("plumeType")) {
             int idx = compound.getInt("plumeType");
