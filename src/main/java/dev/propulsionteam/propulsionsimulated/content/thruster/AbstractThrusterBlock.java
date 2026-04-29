@@ -1,9 +1,4 @@
 package dev.propulsionteam.propulsionsimulated.content.thruster;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import dev.propulsionteam.propulsionsimulated.registries.PropulsionShapes;
-import dev.propulsionteam.propulsionsimulated.content.thruster.thruster.ThrusterBlockEntity;
-
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
@@ -86,10 +81,14 @@ public abstract class AbstractThrusterBlock extends DirectionalBlock implements 
                                               final Player player,
                                               final InteractionHand hand,
                                               final BlockHitResult hitResult) {
-        return this.onBlockEntityUseItemOn(level, pos,
+        final ItemInteractionResult interactionResult = this.onBlockEntityUseItemOn(level, pos,
                 be -> be.tryConsumeFuelBucket(player, hand, stack)
                         ? ItemInteractionResult.sidedSuccess(level.isClientSide())
                         : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
+        if (interactionResult != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+            return interactionResult;
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @Override
