@@ -1,56 +1,63 @@
 <p align="center">
-  <img width="300" height="300" src="https://github.com/Propulsion-Team/create-propulsion-simulated/blob/main/src/main/resources/icon.png">
+  <img width="170" height="170" src="https://github.com/Propulsion-Team/create-propulsion-simulated/blob/main/src/main/resources/icon.png">
 </p>
 
-<h1 align="center">Create: Propulsion - Simulated Edition</h1>
+<h1 align="center">Create Propulsion: Simulated</h1>
 
-<p align="left">
-  A Sable / Create Aeronautics focused fork of Create: Propulsion for NeoForge 1.21.1.
-  Original here: [Create: Propulsion](https://github.com/SergeyFeduk/Create-Propulsion)
+<p align="center">
+  <a href="https://discord.gg/JHcArsDhh4">
+    <img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.3.1/assets/cozy/social/discord-plural_vector.svg">
+  </a>
+  <a href="https://ko-fi.com/kyivsec">
+    <img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.3.1/assets/cozy/donate/kofi-plural_vector.svg">
+  </a>
+  <a href="https://github.com/KyivSec/create_propulsion_simulated">
+    <img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3.3.1/assets/cozy/available/github_vector.svg">
+  </a>
 </p>
 
-# What Was Changed In This Fork
+<p align="center">
+  <img src="https://cdn.modrinth.com/data/cached_images/b945a562109fe5a7c7045931e0e3957fded1d2d0.png">
+</p>
 
-## Sable and Simulated Support
-- Remade the mod to work with Simulated/Sable's system.
-- Thruster and related systems updated to actually provide thrust, lift.
+---
+**Create Propulsion: Simulated** is a NeoForge addon for Minecraft 1.21.1 that brings propulsion-focused Create gameplay to the Sable + Create Aeronautics ecosystem.
 
-## Fuel and heat tuning
-- Added data-driven thruster fuel compatibility for:
-  - Create: Diesel Generators (`createdieselgenerators`)
-  - TFMG (`tfmg`)
-  - Immersive Engineering (`immersiveengineering`)
-  - Immersive Petroleum (`immersivepetroleum`)
-  - Mekanism (`mekanism`)
-  - Mekanism: Generators (`mekanismgenerators`)
-  - Northstar Redux (`northstar`)
-  - Stellaris (`stellaris`)
-- Added configurable fluid efficiency multipliers that affect both:
-  - Thrusters
-  - Liquid Burners
-- Default behavior includes baseline fuels at ~100% and lava at 75%.
+It adds three thruster types:
 
-## Gameplay polish
-- Thruster goggles now reflect fuel efficiency correctly (not just obstruction).
-- Thruster hazard behavior is tied to the damage setting (damage + ignition both toggle together).
+- Thruster: standard fuel-based propulsion
+- Ion Thruster: FE-powered propulsion
+- Creative Thruster: configurable high-power propulsion for testing and creative builds
 
-# Main Features
+<p align="center">
+  <img src="https://cdn.modrinth.com/data/cached_images/73336c2909266ed71b87964e32c437f633bc2bea_0.webp">
+</p>
 
-## Methods of propulsion
-- Thruster: Provides thrust to vehicles. Controllable by redstone.
-- Creative Thruster: Produces a variable amount of thrust based on redstone signal level and its configuration. Particle type is configurable.
+<p align="center">
+  The mod integrates directly with Sable and Create Aeronautics contraption physics, including force-at-point behavior for proper torque and multi-thruster handling on assembled crafts.
+</p>
 
-## Redstone components
-- Redstone Transmission: A block that allows precise control of RPM with redstone signals. Has two modes: Direct and Incremental. 
-## Heat system
-- Solid Burner: Produces a moderate amount of heat by burning solid fuels.
-- Liquid Burner: Produces a large amount of heat by burning liquid fuels. Allows liquid to pass through it.
-- Stirling engine: Generates RPM when heat is provided from below. 
+<p align="center">
+  <img src="https://cdn.modrinth.com/data/cached_images/4e0d4859721fecffd9d4619ca190f494afee4756.png">
+</p>
 
-# Notes
+<p align="center">
+  It also includes Copycat Wings for lightweight aerodynamic building with copycat-style visual customization.
+</p>
 
-- Many systems are configurable in server/client config.
-- Fuel support is data-driven (`data/createpropulsion/thruster_fuels`) and can be extended with datapacks.
+**Thrusters support fuels from these mods:**
+- [Create: The Factory Must Grow](https://modrinth.com/mod/create-tfmg)
+- [Create: Crafts & Additions](https://modrinth.com/mod/createaddition)
+- [Create: Diesel Generators](https://modrinth.com/mod/create-diesel-generators)
+- [Immersive Engineering](https://modrinth.com/mod/immersiveengineering)
+- [Mekanism: Generators](https://modrinth.com/mod/mekanism-generators)
+- [Northstar: Redux](https://modrinth.com/mod/northstar-redux)
+- [Stellaris](https://modrinth.com/mod/stellaris)
+
+**Special thanks to:**
+- **PacificCyan** - Ion Thruster model
+- **FoxyFox909** - Multiblock Thrusters
+- **DeltaSF** - Original Create: Propulsion creator for 1.20.1
 
 # Wiki
 
