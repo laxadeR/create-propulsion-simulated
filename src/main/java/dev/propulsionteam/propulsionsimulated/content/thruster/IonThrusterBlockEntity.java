@@ -28,6 +28,8 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
     private static final double ION_MAX_THRUST_PN = PropulsionConfig.ION_THRUSTER_MAX_SPEED.get();
     private int energyStored;
     private double energyDrainAccumulator;
+    private long lastEnergyDrainGameTime = -1L;
+    private double lastConsumedFePerTick;
 
     private final IEnergyStorage energyHandler = new IEnergyStorage() {
         @Override
@@ -35,12 +37,15 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
             if (maxReceive <= 0) {
                 return 0;
             }
+            final boolean wasEmpty = energyStored <= 0;
             final int accepted = Math.min(maxReceive, Math.max(0, getEnergyCapacity() - energyStored));
             if (!simulate && accepted > 0) {
                 energyStored += accepted;
                 setChanged();
-                // Mark thrust dirty so it recalculates when energy is added
-                dirtyThrust();
+                // Recalculate immediately only when transitioning from unpowered to powered.
+                if (wasEmpty) {
+                    dirtyThrust();
+                }
                 notifyUpdate();
             }
             return accepted;
@@ -77,6 +82,13 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
     }
 
     @Override
+    public void tick() {
+        // Ion thrusters should evaluate power/consumption every server tick so FE usage is stable and responsive.
+        this.isThrustDirty = true;
+        super.tick();
+    }
+
+    @Override
     public void addBehaviours(final List<BlockEntityBehaviour> behaviours) {
         // No tank behaviour for Ion Thruster
     }
@@ -91,10 +103,19 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
             float thrustPercentage = Math.min(currentPower, obstructionEffect);
 
             if (thrustPercentage > 0) {
-                int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
-                float drainPerTick = (float) (thrustPercentage * PropulsionConfig.ION_THRUSTER_FE_PER_TICK_AT_FULL_THROTTLE.get());
-                int totalDrain = (int) Math.ceil(drainPerTick * tick_rate);
-                
+                long currentGameTime = level != null ? level.getGameTime() : 0L;
+                int ticksElapsed = 1;
+                if (lastEnergyDrainGameTime >= 0L) {
+                    ticksElapsed = (int) Math.max(0L, currentGameTime - lastEnergyDrainGameTime);
+                }
+                lastEnergyDrainGameTime = currentGameTime;
+
+                // Config value is FE/t at full throttle; scale by throttle and elapsed ticks.
+                double requestedDrain = energyDrainAccumulator
+                        + (double) ticksElapsed * thrustPercentage * PropulsionConfig.ION_THRUSTER_FE_PER_TICK_AT_FULL_THROTTLE.get();
+                int totalDrain = (int) Math.floor(requestedDrain);
+                energyDrainAccumulator = requestedDrain - totalDrain;
+
                 int consumed = Math.min(energyStored, totalDrain);
                 if (consumed > 0) {
                     energyStored -= consumed;
@@ -104,7 +125,12 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
                     baseThrustPn *= (float) calculateAtmosphericFactor();
                     thrust = baseThrustPn * thrustMultiplier * thrustPercentage * consumptionRatio;
                 }
+                lastConsumedFePerTick = ticksElapsed > 0 ? (double) consumed / (double) ticksElapsed : 0.0d;
+            } else {
+                lastConsumedFePerTick = 0.0d;
             }
+        } else {
+            lastConsumedFePerTick = 0.0d;
         }
         // Mark dirty if energy was depleted to force thrust recalculation
         if (energyStored == 0 && thrust == 0) {
@@ -242,12 +268,18 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
                 .add(Component.literal(Integer.toString(this.getEnergyCapacity())).withStyle(ChatFormatting.AQUA))
                 .add(Component.literal(" FE").withStyle(ChatFormatting.GRAY))
                 .forGoggles(tooltip);
+        CreateLang.builder()
+                .add(Component.literal(" "))
+                .add(Component.literal(String.format(java.util.Locale.ROOT, "%.1f", this.lastConsumedFePerTick)).withStyle(ChatFormatting.AQUA))
+                .add(Component.literal(" FE/t").withStyle(ChatFormatting.GRAY))
+                .forGoggles(tooltip);
     }
 
     @Override
     protected void write(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         tag.putInt("EnergyStored", this.energyStored);
         tag.putDouble("EnergyDrainAccumulator", this.energyDrainAccumulator);
+        tag.putDouble("LastConsumedFePerTick", this.lastConsumedFePerTick);
         super.write(tag, registries, clientPacket);
     }
 
@@ -255,6 +287,8 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         this.energyStored = tag.getInt("EnergyStored");
         this.energyDrainAccumulator = tag.getDouble("EnergyDrainAccumulator");
+        this.lastConsumedFePerTick = tag.getDouble("LastConsumedFePerTick");
+        this.lastEnergyDrainGameTime = -1L;
         this.clampEnergyToCapacity();
         super.read(tag, registries, clientPacket);
         // Ion thrusters are always single-block; strip any accidental multi state from old data.
