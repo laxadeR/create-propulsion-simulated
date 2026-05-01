@@ -1,9 +1,9 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        " I ",
-        "IAI",
-        " I "
+        "IBI",
+        "BAB",
+        "IBI"
     ],
     "key": {
         "I": {
@@ -11,10 +11,13 @@
         },
         "A": {
             "item": "create:andesite_alloy"
+        },
+        "B": {
+            "item": "minecraft:iron_nugget"
         }
     },
     "result": {
         "id": "createpropulsion:wing",
-        "count": 2
+        "count": 4
     }
 }

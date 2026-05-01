@@ -354,7 +354,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
         if (emptyBlocks == 0) return;
         float power = getPower();
     
-        double particleCountMultiplier = org.joml.Math.clamp(0.0, 2.0, PropulsionConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get());
+        double particleCountMultiplier = PropulsionConfig.CLIENT_SPEC.isLoaded() ? org.joml.Math.clamp(0.0, 2.0, PropulsionConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get()) : 1.0;
         if (particleCountMultiplier <= 0) return;
     
         clientTick++;

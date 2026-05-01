@@ -2,13 +2,13 @@
     "type": "create:cutting",
     "ingredients": [
         {
-            "item": "create:zinc_ingot"
+            "item": "createpropulsion:wing"
         }
     ],
     "results": [
         {
             "id": "createpropulsion:copycat_wing",
-            "count": 4
+            "count": 1
         }
     ],
     "processingTime": 50
