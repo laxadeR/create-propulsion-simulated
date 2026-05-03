@@ -42,6 +42,7 @@ public class PropulsionConfig {
     public static final ModConfigSpec.DoubleValue GROUND_PROBE_DISTANCE;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> FUEL_PROPERTIES;
     public static final ModConfigSpec.DoubleValue TILT_ADAPTER_MAX_ANGLE;
+    public static final ModConfigSpec.IntValue CABLE_ENERGY_TRANSFER;
 
     // ── Legacy-style values kept for backward compat with other subsystems ──
     public static final ModConfigSpec.ConfigValue<Double>  THRUSTER_THRUST_MULTIPLIER;
@@ -213,6 +214,11 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Burners");
             BURNERS_POWER_HEATED_MIXERS = SERVER_BUILDER.comment("If true - both solid and liquid burners can provide heat to heated mixers allowing for pre-nether brass.")
                 .define("Burners power heated mixers", true);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("Cable");
+            CABLE_ENERGY_TRANSFER = SERVER_BUILDER.comment("Maximum FE moved per tick by a single cable block.")
+                .defineInRange("Energy transfer", 1_000, 1, 100_000_000);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Fuel Configuration");

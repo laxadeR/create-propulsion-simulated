@@ -1,7 +1,7 @@
 package dev.propulsionteam.propulsionsimulated.registries;
 
 import dev.propulsionteam.propulsionsimulated.CreatePropulsion;
-import dev.propulsionteam.propulsionsimulated.content.cable.CableSpoolItem;
+//import dev.propulsionteam.propulsionsimulated.content.cable.CableSpoolItem;
 import dev.propulsionteam.propulsionsimulated.utility.BurnableItem;
 
 import net.minecraft.world.item.Item;
@@ -29,8 +29,8 @@ public class PropulsionItems {
         ITEMS.register("raw_platinum", () -> new Item(new Item.Properties()));
     public static final DeferredHolder<Item, Item> CRUSHED_RAW_PLATINUM =
         ITEMS.register("crushed_raw_platinum", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, CableSpoolItem> CABLE_SPOOL =
-        ITEMS.register("cable_spool", () -> new CableSpoolItem(new Item.Properties().stacksTo(1)));
+    // public static final DeferredHolder<Item, CableSpoolItem> CABLE_SPOOL =
+    //     ITEMS.register("cable_spool", () -> new CableSpoolItem(new Item.Properties().stacksTo(1)));
 
     public static void register(IEventBus modBus) {
         ITEMS.register(modBus);

@@ -157,6 +157,7 @@
     "item.createpropulsion.crushed_raw_platinum": "Crushed Raw Platinum",
     "item.createpropulsion.cable_spool": "Cable Spool",
     "item.createpropulsion.cable_spool.first_set": "Cable start set",
+    "block.createpropulsion.cable": "Cable",
     "block.createpropulsion.cable_hub": "Cable Hub",
     "item.createpropulsion.coral_bucket": "Coral Bucket",
     "fluid.createpropulsion.coral": "Coral",
