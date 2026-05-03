@@ -4,6 +4,7 @@ import dev.propulsionteam.propulsionsimulated.PropulsionConfig;
 import dev.propulsionteam.propulsionsimulated.particles.plasma.PlasmaParticleData;
 import dev.propulsionteam.propulsionsimulated.particles.plume.PlumeParticleData;
 import dev.propulsionteam.propulsionsimulated.content.thruster.thruster.ThrusterBlockEntity;
+import dev.propulsionteam.propulsionsimulated.utility.math.MathUtility;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -12,7 +13,6 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 
 public final class ThrusterParticles {
-    private static final float LOWEST_POWER_THRESHOLD = 5.0f / 15.0f;
     private static final float PARTICLE_VELOCITY = 4.0f;
 
     private ThrusterParticles() {
@@ -48,15 +48,20 @@ public final class ThrusterParticles {
         final Vec3 basePos = projection.position();
         final Vec3 dir = projection.direction().normalize();
         final float throttle = (float) blockEntity.getThrottle();
-        final float visualPower = Math.max(throttle, LOWEST_POWER_THRESHOLD);
-        final int count = Math.max(1, (int) Math.ceil(PropulsionConfig.CLIENT_PARTICLES_PER_TICK.get() * visualPower));
+        final float emissionScale = Math.max(throttle, (float) MathUtility.epsilon);
+        final double speed = PARTICLE_VELOCITY * emissionScale;
+        final int maxCap = PropulsionConfig.CLIENT_PARTICLES_PER_TICK.get();
+        if (maxCap <= 0) {
+            return;
+        }
+        final int densityCount = Math.max(1, (int) Math.ceil(speed / AbstractThrusterBlockEntity.TARGET_PARTICLE_SPACING_BLOCKS));
+        final int count = Math.min(maxCap, densityCount);
 
         for (int i = 0; i < count; i++) {
-            final double px = basePos.x;
-            final double py = basePos.y;
-            final double pz = basePos.z;
-
-            final double speed = PARTICLE_VELOCITY * visualPower;
+            final double beamFrac = count <= 1 ? 0.0 : (double) i / (double) count;
+            final double px = basePos.x + dir.x * speed * beamFrac;
+            final double py = basePos.y + dir.y * speed * beamFrac;
+            final double pz = basePos.z + dir.z * speed * beamFrac;
             final double vx = dir.x * speed;
             final double vy = dir.y * speed;
             final double vz = dir.z * speed;

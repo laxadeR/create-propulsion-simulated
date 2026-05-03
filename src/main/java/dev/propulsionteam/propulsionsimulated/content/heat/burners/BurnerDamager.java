@@ -3,8 +3,6 @@ package dev.propulsionteam.propulsionsimulated.content.heat.burners;
 import java.awt.Color;
 import java.util.Optional;
 
-import dev.propulsionteam.propulsionsimulated.debug.PropulsionDebug;
-import dev.propulsionteam.propulsionsimulated.debug.routes.MainDebugRoute;
 import dev.propulsionteam.propulsionsimulated.utility.AbstractAreaDamagerBehaviour;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -55,7 +53,7 @@ public class BurnerDamager extends AbstractAreaDamagerBehaviour {
 
     @Override
     protected boolean shouldDebug() {
-        return PropulsionDebug.isDebug(MainDebugRoute.BURNER);
+        return false;
     }
 
     @Override

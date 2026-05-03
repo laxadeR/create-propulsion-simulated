@@ -9,6 +9,8 @@ import dev.propulsionteam.propulsionsimulated.content.heat.IHeatConsumer;
 import dev.propulsionteam.propulsionsimulated.registries.PropulsionBlockEntities;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import com.simibubi.create.content.processing.burner.BlazeBurnerBlock;
+import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 
@@ -105,6 +107,24 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
             if (activeTicks == 0) {
                 updateGeneratedRotation();
             }
+        }
+
+        tickBlazeBurnerHeat();
+    }
+
+    private void tickBlazeBurnerHeat() {
+        if (!isEngineActive()) return;
+        if (!PropulsionConfig.BLAZE_BURNERS_HEAT_STIRLING_ENGINES.get()) return;
+
+        BlockState below = level.getBlockState(worldPosition.below());
+        if (!(below.getBlock() instanceof BlazeBurnerBlock)) return;
+        if (!below.hasProperty(BlazeBurnerBlock.HEAT_LEVEL)) return;
+        if (!below.getValue(BlazeBurnerBlock.HEAT_LEVEL).isAtLeast(HeatLevel.FADING)) return;
+
+        boolean wasInactive = activeTicks == 0;
+        activeTicks = 3;
+        if (wasInactive) {
+            updateGeneratedRotation();
         }
     }
 

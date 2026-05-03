@@ -49,19 +49,20 @@ public class PropulsionConfig {
     public static final ModConfigSpec.ConfigValue<Double>  THRUSTER_CONSUMPTION_MULTIPLIER;
     public static final ModConfigSpec.ConfigValue<Integer> THRUSTER_TICKS_PER_UPDATE;
     public static final ModConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
-    public static final ModConfigSpec.ConfigValue<Double>  THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
-    public static final ModConfigSpec.ConfigValue<Double>  THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue STANDARD_THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue STANDARD_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue ION_THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue ION_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue CREATIVE_THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue CREATIVE_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue CREATIVE_VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue CREATIVE_VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER;
     public static final ModConfigSpec.BooleanValue DEBUG_THRUSTER;
-    public static final ModConfigSpec.BooleanValue DEBUG_BURNER;
-    public static final ModConfigSpec.BooleanValue DEBUG_MAGNET;
 
     // Creative Thruster (legacy)
     public static final ModConfigSpec.ConfigValue<Double> CREATIVE_THRUSTER_THRUST_MULTIPLIER;
-
-    // Optical sensors
-    public static final ModConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_TICKS_PER_UPDATE;
-    public static final ModConfigSpec.ConfigValue<Integer> INLINE_OPTICAL_SENSOR_MAX_DISTANCE;
-    public static final ModConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_MAX_DISTANCE;
 
     // Wings
     public static final ModConfigSpec.ConfigValue<Double> BASE_WING_LIFT;
@@ -69,6 +70,7 @@ public class PropulsionConfig {
 
     // Stirling engine
     public static final ModConfigSpec.ConfigValue<Double> STIRLING_GENERATED_SU;
+    public static final ModConfigSpec.BooleanValue BLAZE_BURNERS_HEAT_STIRLING_ENGINES;
     public static final ModConfigSpec.ConfigValue<Double> TILT_ADAPTER_ANGLE_RANGE;
     public static final ModConfigSpec.ConfigValue<Double> STIRLING_REVOLUTION_PERIOD;
     public static final ModConfigSpec.ConfigValue<Double> STIRLING_CRANK_RADIUS;
@@ -82,6 +84,8 @@ public class PropulsionConfig {
     private static final Map<String, ModConfigSpec.DoubleValue> FUEL_EFFICIENCY_OVERRIDES = new LinkedHashMap<>();
     private static final Map<String, ModConfigSpec.DoubleValue> FUEL_BURN_RATE_OVERRIDES = new LinkedHashMap<>();
     private static final Map<String, ModConfigSpec.IntValue> CORAL_FUEL_CONVERSION_OVERRIDES = new LinkedHashMap<>();
+    public static final ModConfigSpec.BooleanValue BURNERS_HEAT_STEAM_ENGINES;
+    public static final ModConfigSpec.BooleanValue BURNERS_SUPERHEAT_STEAM_ENGINES;
 
     static {
         //#region Server
@@ -173,15 +177,6 @@ public class PropulsionConfig {
                 .defineInRange("groundProbeDistance", 1.5d, 0.05d, 5.0d);
         SERVER_BUILDER.pop();
 
-        SERVER_BUILDER.push("Optical sensors");
-            OPTICAL_SENSOR_TICKS_PER_UPDATE = SERVER_BUILDER.comment("How many ticks between casting a ray.")
-                .defineInRange("Optical sensor tick rate", 2, 1, 100);
-            INLINE_OPTICAL_SENSOR_MAX_DISTANCE = SERVER_BUILDER.comment("Length of the raycast ray.")
-                .defineInRange("Inline optical sensor max raycast distance", 16, 4, 32);
-            OPTICAL_SENSOR_MAX_DISTANCE = SERVER_BUILDER.comment("Length of the raycast ray. Very high values may degrade performance.")
-                .defineInRange("Optical sensor max raycast distance", 32, 8, 64);
-        SERVER_BUILDER.pop();
-
         SERVER_BUILDER.push("Wing");
             BASE_WING_LIFT = SERVER_BUILDER.comment("Wing's lift force is multiplied by this number.")
                 .define("Base lift", 150.0);
@@ -192,6 +187,8 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Stirling Engine");
             STIRLING_GENERATED_SU = SERVER_BUILDER.comment("Change this value to modify the amount of stress units produced by stirling engine. Value of 16 corresponds to 4096 SU.")
                 .defineInRange("Generated stress units", 16.0, 1.0, 64.0);
+            BLAZE_BURNERS_HEAT_STIRLING_ENGINES = SERVER_BUILDER.comment("If true - vanilla Create Blaze Burners can heat Stirling Engines placed directly above them.")
+                .define("Blaze Burners heat Stirling Engines", true);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Tilt Adapter");
@@ -204,6 +201,10 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Burners");
             BURNERS_POWER_HEATED_MIXERS = SERVER_BUILDER.comment("If true - both solid and liquid burners can provide heat to heated mixers allowing for pre-nether brass.")
                 .define("Burners power heated mixers", true);
+            BURNERS_HEAT_STEAM_ENGINES = SERVER_BUILDER.comment("If true - solid and liquid burners can heat Steam Engine boilers.")
+                .define("Burners heat Steam Engines", true);
+            BURNERS_SUPERHEAT_STEAM_ENGINES = SERVER_BUILDER.comment("If true - solid and liquid burners at full heat can superheat Steam Engine boilers. Has no effect if 'Burners heat Steam Engines' is disabled.")
+                .define("Burners superheat Steam Engines", true);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Fuel Configuration");
@@ -257,10 +258,36 @@ public class PropulsionConfig {
 
         //#region Client
         CLIENT_BUILDER.push("Thruster");
-            THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = CLIENT_BUILDER.comment("Particle additional velocity modifier when ship is moving in the same direction as exhaust.")
-                    .define("Particle velocity offset", 0.15);
-            THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
-                    .define("Particle count multiplier", 1.0);
+            CLIENT_BUILDER.push("Standard");
+                STANDARD_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
+                        .defineInRange("Particle count multiplier", 1.0, 0.0, 32.0);
+                STANDARD_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Multiplier on emitted particle velocity. 1.0 keeps the default exhaust speed.")
+                        .defineInRange("Particle velocity multiplier", 1.0, 0.0, 32.0);
+            CLIENT_BUILDER.pop();
+            CLIENT_BUILDER.push("Ion");
+                ION_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
+                        .defineInRange("Particle count multiplier", 1.0, 0.0, 32.0);
+                ION_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Multiplier on emitted particle velocity. 1.0 keeps the default exhaust speed.")
+                        .defineInRange("Particle velocity multiplier", 1.0, 0.0, 32.0);
+            CLIENT_BUILDER.pop();
+            CLIENT_BUILDER.push("Vector");
+                VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
+                        .defineInRange("Particle count multiplier", 1.0, 0.0, 32.0);
+                VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Multiplier on emitted particle velocity. 1.0 keeps the default exhaust speed.")
+                        .defineInRange("Particle velocity multiplier", 1.0, 0.0, 32.0);
+            CLIENT_BUILDER.pop();
+            CLIENT_BUILDER.push("Creative");
+                CREATIVE_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
+                        .defineInRange("Particle count multiplier", 1.0, 0.0, 32.0);
+                CREATIVE_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Multiplier on emitted particle velocity. 1.0 keeps the default exhaust speed.")
+                        .defineInRange("Particle velocity multiplier", 1.0, 0.0, 32.0);
+            CLIENT_BUILDER.pop();
+            CLIENT_BUILDER.push("Creative Vector");
+                CREATIVE_VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
+                        .defineInRange("Particle count multiplier", 1.0, 0.0, 32.0);
+                CREATIVE_VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Multiplier on emitted particle velocity. 1.0 keeps the default exhaust speed.")
+                        .defineInRange("Particle velocity multiplier", 1.0, 0.0, 32.0);
+            CLIENT_BUILDER.pop();
         CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("Stirling Engine");
             STIRLING_REVOLUTION_PERIOD = CLIENT_BUILDER.comment("Revolution period of the simulated shaft (affects only piston movement).")
@@ -273,10 +300,6 @@ public class PropulsionConfig {
         CLIENT_BUILDER.push("Debug");
             DEBUG_THRUSTER = CLIENT_BUILDER.comment("Render thruster debug overlays (plume ray, obstruction hits, damage zones).")
                 .define("Thruster", false);
-            DEBUG_BURNER = CLIENT_BUILDER.comment("Render burner debug overlays.")
-                .define("Burner", false);
-            DEBUG_MAGNET = CLIENT_BUILDER.comment("Enable magnet debug overlays.")
-                .define("Magnet", false);
         CLIENT_BUILDER.pop();
 
         CLIENT_SPEC = CLIENT_BUILDER.build();
@@ -347,6 +370,8 @@ public class PropulsionConfig {
                 "createaddition:seed_oil=55",
                 "northstar:methane=105",
                 "northstar:liquid_hydrogen=125",
+                "immersivepetroleum:diesel=100",
+                "immersivepetroleum:gasoline=125",
                 "immersivepetroleum:diesel_sulfur=100"
         );
     }
@@ -379,6 +404,8 @@ public class PropulsionConfig {
                 "createaddition:seed_oil=170",
                 "northstar:methane=95",
                 "northstar:liquid_hydrogen=80",
+                "immersivepetroleum:diesel=100",
+                "immersivepetroleum:gasoline=80",
                 "immersivepetroleum:diesel_sulfur=100"
         );
     }

@@ -170,6 +170,16 @@ public class IonThrusterBlockEntity extends ThrusterBlockEntity {
     }
 
     @Override
+    protected double getParticleCountMultiplier() {
+        return PropulsionConfig.ION_THRUSTER_PARTICLE_COUNT_MULTIPLIER.get();
+    }
+
+    @Override
+    protected double getParticleVelocityMultiplier() {
+        return PropulsionConfig.ION_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER.get();
+    }
+
+    @Override
     protected boolean supportsMultiblock() {
         return false;
     }

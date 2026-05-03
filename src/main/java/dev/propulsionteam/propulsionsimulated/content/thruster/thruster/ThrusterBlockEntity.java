@@ -594,8 +594,8 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
         }
         if (!shouldEmitParticles()) return;
         float power = getPower();
-        float visualPower = Math.max(power, LOWEST_POWER_THRESHOLD);
-        if (visualPower <= 0) return;
+        float emissionScale = (float) Math.max(power, MathUtility.epsilon);
+        if (power <= 0) return;
 
         Direction direction = state.getValue(AbstractThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
@@ -619,12 +619,19 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             worldExhaustDirection = worldExhaustDirection.normalize();
         }
 
+        double particleCountMultiplier = org.joml.Math.clamp(0.0d, PARTICLE_MULTIPLIER_CAP, getParticleCountMultiplier());
+        if (particleCountMultiplier <= 0) return;
+        double particleVelocityMultiplier = org.joml.Math.clamp(0.0d, PARTICLE_MULTIPLIER_CAP, getParticleVelocityMultiplier());
+
         float velocityScale = width == 2 ? 1.15f : 1.3f;
         Vector3d particleVelocity = new Vector3d(worldExhaustDirection.x, worldExhaustDirection.y, worldExhaustDirection.z)
-            .mul(4.0f * visualPower * velocityScale);
+            .mul(4.0f * emissionScale * velocityScale * particleVelocityMultiplier);
         ParticleOptions particleData = createParticleOptions();
 
-        int particlesToSpawn = (width == 2 ? 14 : 28);
+        double speedPerTick = particleVelocity.length();
+        int streamParticles = Math.max(1, (int) Math.ceil(speedPerTick / TARGET_PARTICLE_SPACING_BLOCKS * particleCountMultiplier));
+        int crossSectionParticles = Math.max(1, (int) Math.round((width == 2 ? 14 : 28) * particleCountMultiplier));
+        int particlesToSpawn = Math.max(streamParticles, crossSectionParticles);
         double plumeRadius = width == 2 ? 0.45 : 0.7;
         for (int i = 0; i < particlesToSpawn; i++) {
             double ox = (level.random.nextDouble() * 2.0 - 1.0) * plumeRadius;
@@ -636,10 +643,11 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                 case Y -> oy = 0.0;
                 case Z -> oz = 0.0;
             }
+            double beamFrac = particlesToSpawn <= 1 ? 0.0 : (double) i / (double) particlesToSpawn;
             if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                double px = worldNozzlePosition.x + ox;
-                double py = worldNozzlePosition.y + oy;
-                double pz = worldNozzlePosition.z + oz;
+                double px = worldNozzlePosition.x + ox + particleVelocity.x * beamFrac;
+                double py = worldNozzlePosition.y + oy + particleVelocity.y * beamFrac;
+                double pz = worldNozzlePosition.z + oz + particleVelocity.z * beamFrac;
                 double maxDistSq = PARTICLE_BROADCAST_RANGE_BLOCKS * PARTICLE_BROADCAST_RANGE_BLOCKS;
                 for (ServerPlayer player : serverLevel.players()) {
                     if (player.distanceToSqr(px, py, pz) > maxDistSq) {
@@ -663,9 +671,9 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                 level.addParticle(
                     particleData,
                     true,
-                    worldNozzlePosition.x + ox,
-                    worldNozzlePosition.y + oy,
-                    worldNozzlePosition.z + oz,
+                    worldNozzlePosition.x + ox + particleVelocity.x * beamFrac,
+                    worldNozzlePosition.y + oy + particleVelocity.y * beamFrac,
+                    worldNozzlePosition.z + oz + particleVelocity.z * beamFrac,
                     particleVelocity.x,
                     particleVelocity.y,
                     particleVelocity.z

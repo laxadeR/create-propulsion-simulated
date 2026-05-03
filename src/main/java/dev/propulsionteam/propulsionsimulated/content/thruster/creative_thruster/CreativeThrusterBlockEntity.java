@@ -78,6 +78,16 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
+    protected double getParticleCountMultiplier() {
+        return PropulsionConfig.CREATIVE_THRUSTER_PARTICLE_COUNT_MULTIPLIER.get();
+    }
+
+    @Override
+    protected double getParticleVelocityMultiplier() {
+        return PropulsionConfig.CREATIVE_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER.get();
+    }
+
+    @Override
     public PlumeType getPlumeType() {
         return plumeType;
     }

@@ -3,9 +3,7 @@ package dev.propulsionteam.propulsionsimulated.debug.routes;
 import dev.propulsionteam.propulsionsimulated.debug.IDebugRoute;
 
 public enum MainDebugRoute implements IDebugRoute {
-    THRUSTER,
-    MAGNET,                                  
-    BURNER;
+    THRUSTER;
 
     private final IDebugRoute[] children;
     MainDebugRoute(IDebugRoute... children) { this.children = children; }

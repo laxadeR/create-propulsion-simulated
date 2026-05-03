@@ -74,6 +74,16 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
     }
 
     @Override
+    protected double getParticleCountMultiplier() {
+        return PropulsionConfig.CREATIVE_VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER.get();
+    }
+
+    @Override
+    protected double getParticleVelocityMultiplier() {
+        return PropulsionConfig.CREATIVE_VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER.get();
+    }
+
+    @Override
     public CreativeThrusterBlockEntity.PlumeType getPlumeType() {
         return plumeType;
     }

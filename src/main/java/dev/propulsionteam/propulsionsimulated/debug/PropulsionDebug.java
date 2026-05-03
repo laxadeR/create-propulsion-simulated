@@ -27,12 +27,6 @@ public class PropulsionDebug {
         if (route == MainDebugRoute.THRUSTER) {
             return PropulsionConfig.CLIENT_SPEC.isLoaded() && PropulsionConfig.DEBUG_THRUSTER.get();
         }
-        if (route == MainDebugRoute.BURNER) {
-            return PropulsionConfig.CLIENT_SPEC.isLoaded() && PropulsionConfig.DEBUG_BURNER.get();
-        }
-        if (route == MainDebugRoute.MAGNET) {
-            return PropulsionConfig.CLIENT_SPEC.isLoaded() && PropulsionConfig.DEBUG_MAGNET.get();
-        }
         return activeDebugStates.getOrDefault(route, false);
     }
 

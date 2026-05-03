@@ -3,9 +3,12 @@ package dev.propulsionteam.propulsionsimulated.content.heat.burners;
 import java.util.List;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.content.fluids.tank.FluidTankBlock;
+import com.simibubi.create.content.processing.basin.BasinBlockEntity;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.utility.CreateLang;
 
+import dev.propulsionteam.propulsionsimulated.PropulsionConfig;
 import dev.propulsionteam.propulsionsimulated.content.heat.HeatMapper;
 import dev.propulsionteam.propulsionsimulated.content.heat.HeatSourceBehavior;
 import dev.propulsionteam.propulsionsimulated.content.heat.IHeatConsumer;
@@ -72,9 +75,13 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
     protected boolean shouldThermostatBurn() {
         if (isPowered) return true; //Redstone override
         if (level == null) return false;
-        
+
+        if (level.getBlockState(worldPosition.above()).getBlock() instanceof FluidTankBlock) return true;
+
         BlockEntity beAbove = level.getBlockEntity(worldPosition.above());
         if (beAbove == null) return false;
+
+        if (beAbove instanceof BasinBlockEntity && PropulsionConfig.BURNERS_POWER_HEATED_MIXERS.get()) return true;
 
         if (beAbove instanceof IHeatConsumer consumer) {
                 if (!consumer.isActive()) return false;

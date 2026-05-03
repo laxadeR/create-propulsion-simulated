@@ -47,6 +47,16 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
     }
 
     @Override
+    protected double getParticleCountMultiplier() {
+        return PropulsionConfig.VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER.get();
+    }
+
+    @Override
+    protected double getParticleVelocityMultiplier() {
+        return PropulsionConfig.VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER.get();
+    }
+
+    @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
         

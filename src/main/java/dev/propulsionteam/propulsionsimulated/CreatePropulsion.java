@@ -4,6 +4,7 @@ import dev.propulsionteam.propulsionsimulated.registries.*;
 
 import dev.propulsionteam.propulsionsimulated.compat.computercraft.CCProxy;
 import dev.propulsionteam.propulsionsimulated.events.ModCapabilityEvents;
+import dev.propulsionteam.propulsionsimulated.events.ModSetupEvents;
 import dev.propulsionteam.propulsionsimulated.network.PropulsionPackets;
 import dev.propulsionteam.propulsionsimulated.particles.ParticleTypes;
 import com.simibubi.create.compat.Mods;
@@ -26,6 +27,7 @@ public class CreatePropulsion {
                             + "Both mods provide the same features and cannot be loaded together.");
         }
         modBus.addListener(ModCapabilityEvents::registerCapabilities);
+        modBus.addListener(ModSetupEvents::onCommonSetup);
         //Content
         ParticleTypes.register(modBus);
         PropulsionBlocks.register(modBus);

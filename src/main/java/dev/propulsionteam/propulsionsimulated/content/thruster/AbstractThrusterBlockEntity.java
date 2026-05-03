@@ -48,6 +48,10 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
     protected static final int OBSTRUCTION_LENGTH = 10;
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
     protected static final float PARTICLE_VELOCITY = 4.0f;
+    /** Used by server emit logic and client preview so plume segments stay visually continuous. */
+    public static final double TARGET_PARTICLE_SPACING_BLOCKS = 0.5d;
+    /** Matches {@link PropulsionConfig} thruster particle multiplier defineInRange max (0–32). */
+    protected static final double PARTICLE_MULTIPLIER_CAP = 32.0d;
     protected static final double OBSTRUCTION_RAY_START_EPSILON = 0.05d;
     
     protected static final float LOWEST_POWER_THRESHOLD = 5.0f / 15.0f;
@@ -59,11 +63,17 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
 
     //Ticking
     private int currentTick = 0;
-    private int clientTick = 0;
-    private float particleSpawnAccumulator = 0.0f;
 
     protected double getParticleBroadcastRange() { return PARTICLE_BROADCAST_RANGE_BLOCKS; }
     protected float getParticleVelocity() { return PARTICLE_VELOCITY; }
+
+    protected double getParticleCountMultiplier() {
+        return PropulsionConfig.STANDARD_THRUSTER_PARTICLE_COUNT_MULTIPLIER.get();
+    }
+
+    protected double getParticleVelocityMultiplier() {
+        return PropulsionConfig.STANDARD_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER.get();
+    }
 
     //CC Peripheral
     public AbstractComputerBehaviour computerBehaviour;
@@ -471,24 +481,13 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
         if (emptyBlocks == 0) return;
         float power = getPower();
-    
-        double particleCountMultiplier = PropulsionConfig.CLIENT_SPEC.isLoaded() ? org.joml.Math.clamp(0.0, 2.0, PropulsionConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get()) : 1.0;
-        if (particleCountMultiplier <= 0) return;
-    
-        clientTick++;
-        if (power < LOWEST_POWER_THRESHOLD && clientTick % 2 == 0) {
-            clientTick = 0;
-            return;
-        }
-    
-        this.particleSpawnAccumulator += particleCountMultiplier;
-    
-        int particlesToSpawn = (int) this.particleSpawnAccumulator;
-        if (particlesToSpawn == 0) return;
-    
-        float visualPower = Math.max(power, LOWEST_POWER_THRESHOLD);
 
-        this.particleSpawnAccumulator -= particlesToSpawn;
+        // Dedicated servers do not load CLIENT_SPEC; still read defaults so tuning applies everywhere.
+        double particleCountMultiplier = org.joml.Math.clamp(0.0d, PARTICLE_MULTIPLIER_CAP, getParticleCountMultiplier());
+        if (particleCountMultiplier <= 0) return;
+        double particleVelocityMultiplier = org.joml.Math.clamp(0.0d, PARTICLE_MULTIPLIER_CAP, getParticleVelocityMultiplier());
+
+        float emissionScale = (float) Math.max(power, MathUtility.epsilon);
 
         Vec3 localExhaustDirection = getParticleDebugExhaustDirectionLocal();
         Vector3d additionalVel = new Vector3d();
@@ -505,29 +504,41 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
             worldExhaustDirection = worldExhaustDirection.normalize();
         }
 
-        double particleX = worldNozzlePosition.x;
-        double particleY = worldNozzlePosition.y;
-        double particleZ = worldNozzlePosition.z;
-
         Vector3d particleVelocity = new Vector3d(worldExhaustDirection.x, worldExhaustDirection.y, worldExhaustDirection.z)
-            .mul(getParticleVelocity() * visualPower)
+            .mul(getParticleVelocity() * emissionScale * particleVelocityMultiplier)
             .add(additionalVel);
-    
+
+        // Enough particles each tick so spacing along the velocity vector stays near TARGET_PARTICLE_SPACING_BLOCKS (no fractional carry → no skipped ticks).
+        double speedPerTick = particleVelocity.length();
+        double density = speedPerTick / TARGET_PARTICLE_SPACING_BLOCKS * particleCountMultiplier;
+        int particlesToSpawn = Math.max(1, (int) Math.ceil(density));
+
         ParticleOptions particleData = createParticleOptions();
 
-        //Spawn the calculated number of particles.
+        double nozzleX = worldNozzlePosition.x;
+        double nozzleY = worldNozzlePosition.y;
+        double nozzleZ = worldNozzlePosition.z;
+
         for (int i = 0; i < particlesToSpawn; i++) {
+            // Distribute particles along this tick's exhaust path: i=0 spawns at the nozzle,
+            // later ones spawn progressively further down the plume to fill the visual gap
+            // to the prior tick's particles (which have already moved by `particleVelocity`).
+            double frac = (double) i / (double) particlesToSpawn;
+            double spawnX = nozzleX + particleVelocity.x * frac;
+            double spawnY = nozzleY + particleVelocity.y * frac;
+            double spawnZ = nozzleZ + particleVelocity.z * frac;
+
             if (level instanceof ServerLevel serverLevel) {
                 double maxDistSq = getParticleBroadcastRange() * getParticleBroadcastRange();
                 for (ServerPlayer player : serverLevel.players()) {
-                    if (player.distanceToSqr(particleX, particleY, particleZ) > maxDistSq) {
+                    if (player.distanceToSqr(spawnX, spawnY, spawnZ) > maxDistSq) {
                         continue;
                     }
                     serverLevel.sendParticles(
                         player,
                         particleData,
                         true,
-                        particleX, particleY, particleZ,
+                        spawnX, spawnY, spawnZ,
                         0,
                         particleVelocity.x, particleVelocity.y, particleVelocity.z,
                         1.0
@@ -537,7 +548,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
                 level.addParticle(
                     particleData,
                     true,
-                    particleX, particleY, particleZ,
+                    spawnX, spawnY, spawnZ,
                     particleVelocity.x, particleVelocity.y, particleVelocity.z
                 );
             }

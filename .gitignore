@@ -19,6 +19,7 @@ build
 
 # other
 .vscode
+.claude
 eclipse
 run
 
