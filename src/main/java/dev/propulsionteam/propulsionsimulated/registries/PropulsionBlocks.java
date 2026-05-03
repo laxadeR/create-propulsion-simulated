@@ -4,6 +4,7 @@ import dev.propulsionteam.propulsionsimulated.CreatePropulsion;
 import dev.propulsionteam.propulsionsimulated.content.heat.burners.liquid.LiquidBurnerBlock;
 import dev.propulsionteam.propulsionsimulated.content.heat.burners.solid.SolidBurnerBlock;
 import dev.propulsionteam.propulsionsimulated.content.heat.engine.StirlingEngineBlock;
+import dev.propulsionteam.propulsionsimulated.content.platinum.CoralGeneratorBlock;
 import dev.propulsionteam.propulsionsimulated.content.redstone_transmission.RedstoneTransmissionBlock;
 import dev.propulsionteam.propulsionsimulated.content.tilt_adapter.TiltAdapterBlock;
 import dev.propulsionteam.propulsionsimulated.content.thruster.creative_thruster.CreativeThrusterBlock;
@@ -19,6 +20,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
@@ -70,13 +72,28 @@ public class PropulsionBlocks {
         () -> new CopycatWingBlock(Block.Properties.of().strength(1.5f, 2.0f), 8));
     public static final DeferredBlock<CopycatWingBlock> COPYCAT_WING_12 = BLOCKS.register("copycat_wing_12",
         () -> new CopycatWingBlock(Block.Properties.of().strength(1.5f, 2.0f), 12));
+    public static final DeferredBlock<Block> PLATINUM_ORE = BLOCKS.register("platinum_ore",
+        () -> new Block(Block.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE)
+            .requiresCorrectToolForDrops().strength(3.0f, 3.0f)));
+    public static final DeferredBlock<Block> DEEPSLATE_PLATINUM_ORE = BLOCKS.register("deepslate_platinum_ore",
+        () -> new Block(Block.Properties.of().mapColor(MapColor.DEEPSLATE).sound(SoundType.DEEPSLATE)
+            .requiresCorrectToolForDrops().strength(4.5f, 3.0f)));
+    public static final DeferredBlock<Block> PLATINUM_BLOCK = BLOCKS.register("platinum_block",
+        () -> new Block(Block.Properties.of().mapColor(MapColor.METAL).sound(SoundType.METAL)
+            .requiresCorrectToolForDrops().strength(5.0f, 6.0f)));
+    public static final DeferredBlock<Block> RAW_PLATINUM_BLOCK = BLOCKS.register("raw_platinum_block",
+        () -> new Block(Block.Properties.of().mapColor(MapColor.RAW_IRON).sound(SoundType.STONE)
+            .requiresCorrectToolForDrops().strength(5.0f, 6.0f)));
+    public static final DeferredBlock<CoralGeneratorBlock> CORAL_GENERATOR = BLOCKS.register("coral_generator",
+        () -> new CoralGeneratorBlock(Block.Properties.of().mapColor(MapColor.COLOR_CYAN).sound(SoundType.STONE)
+            .requiresCorrectToolForDrops().strength(3.5f, 3.0f).noOcclusion()));
 
     static {
         registerDefaultBlockItem("thruster", THRUSTER_BLOCK);
-        registerDefaultBlockItem("creative_thruster", CREATIVE_THRUSTER_BLOCK);
-        registerDefaultBlockItem("ion_thruster", ION_THRUSTER_BLOCK);
-        registerDefaultBlockItem("vector_thruster", VECTOR_THRUSTER_BLOCK);
-        registerDefaultBlockItem("creative_vector_thruster", CREATIVE_VECTOR_THRUSTER_BLOCK);
+        registerBlockItem("creative_thruster", CREATIVE_THRUSTER_BLOCK, new BlockItem.Properties().rarity(Rarity.EPIC));
+        registerBlockItem("ion_thruster", ION_THRUSTER_BLOCK, new BlockItem.Properties().rarity(Rarity.UNCOMMON));
+        registerBlockItem("vector_thruster", VECTOR_THRUSTER_BLOCK, new BlockItem.Properties().rarity(Rarity.UNCOMMON));
+        registerBlockItem("creative_vector_thruster", CREATIVE_VECTOR_THRUSTER_BLOCK, new BlockItem.Properties().rarity(Rarity.EPIC));
         registerDefaultBlockItem("redstone_transmission", REDSTONE_TRANSMISSION_BLOCK);
         registerDefaultBlockItem("solid_burner", SOLID_BURNER);
         registerDefaultBlockItem("liquid_burner", LIQUID_BURNER);
@@ -87,13 +104,22 @@ public class PropulsionBlocks {
         BLOCK_ITEMS.register("copycat_wing", () -> new CopycatWingItem(COPYCAT_WING.get(), new BlockItem.Properties()));
         BLOCK_ITEMS.register("copycat_wing_8", () -> new CopycatWingItem(COPYCAT_WING_8.get(), new BlockItem.Properties()));
         BLOCK_ITEMS.register("copycat_wing_12", () -> new CopycatWingItem(COPYCAT_WING_12.get(), new BlockItem.Properties()));
+        registerDefaultBlockItem("platinum_ore", PLATINUM_ORE);
+        registerDefaultBlockItem("deepslate_platinum_ore", DEEPSLATE_PLATINUM_ORE);
+        registerDefaultBlockItem("platinum_block", PLATINUM_BLOCK);
+        registerDefaultBlockItem("raw_platinum_block", RAW_PLATINUM_BLOCK);
+        registerBlockItem("coral_generator", CORAL_GENERATOR, new BlockItem.Properties().rarity(Rarity.RARE));
 
         PropulsionDefaultStress.setImpact(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "redstone_transmission"), 0, false);
         PropulsionDefaultStress.setImpact(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "tilt_adapter"), 0, false);
     }
 
     private static <T extends Block> void registerDefaultBlockItem(String name, DeferredBlock<T> block) {
-        BLOCK_ITEMS.register(name, () -> new BlockItem(block.get(), new BlockItem.Properties()));
+        registerBlockItem(name, block, new BlockItem.Properties());
+    }
+
+    private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block, BlockItem.Properties properties) {
+        BLOCK_ITEMS.register(name, () -> new BlockItem(block.get(), properties));
     }
 
     public static void register(IEventBus modBus) {

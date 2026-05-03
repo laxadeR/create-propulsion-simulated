@@ -2,6 +2,7 @@ package dev.propulsionteam.propulsionsimulated.events;
 
 import dev.propulsionteam.propulsionsimulated.content.heat.burners.liquid.LiquidBurnerBlockEntity;
 import dev.propulsionteam.propulsionsimulated.content.heat.burners.liquid.PassthroughFluidHandler;
+import dev.propulsionteam.propulsionsimulated.content.platinum.CoralGeneratorBlockEntity;
 import dev.propulsionteam.propulsionsimulated.registries.PropulsionBlockEntities;
 import dev.propulsionteam.propulsionsimulated.content.thruster.thruster.ThrusterBlockEntity;
 import dev.propulsionteam.propulsionsimulated.content.thruster.IonThrusterBlockEntity;
@@ -28,6 +29,16 @@ public class ModCapabilityEvents {
             Capabilities.EnergyStorage.BLOCK,
             PropulsionBlockEntities.ION_THRUSTER_BLOCK_ENTITY.get(),
             (be, side) -> ((IonThrusterBlockEntity) be).getEnergyHandler(side)
+        );
+        event.registerBlockEntity(
+            Capabilities.FluidHandler.BLOCK,
+            PropulsionBlockEntities.CORAL_GENERATOR_BLOCK_ENTITY.get(),
+            (be, side) -> ((CoralGeneratorBlockEntity) be).getFluidHandler(side)
+        );
+        event.registerBlockEntity(
+            Capabilities.EnergyStorage.BLOCK,
+            PropulsionBlockEntities.CORAL_GENERATOR_BLOCK_ENTITY.get(),
+            (be, side) -> ((CoralGeneratorBlockEntity) be).getEnergyHandler(side)
         );
     }
 

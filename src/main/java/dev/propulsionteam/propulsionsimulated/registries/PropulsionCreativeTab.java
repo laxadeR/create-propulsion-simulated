@@ -58,6 +58,17 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionBlocks.STIRLING_ENGINE_BLOCK.get());
                 output.accept(PropulsionBlocks.TILT_ADAPTER_BLOCK.get());
                 //From 0.3 (items)
+                output.accept(PropulsionBlocks.PLATINUM_ORE.get());
+                output.accept(PropulsionBlocks.DEEPSLATE_PLATINUM_ORE.get());
+                output.accept(PropulsionBlocks.PLATINUM_BLOCK.get());
+                output.accept(PropulsionBlocks.RAW_PLATINUM_BLOCK.get());
+                output.accept(PropulsionBlocks.CORAL_GENERATOR.get());
+                output.accept(PropulsionItems.PLATINUM_INGOT.get());
+                output.accept(PropulsionItems.PLATINUM_NUGGET.get());
+                output.accept(PropulsionItems.PLATINUM_SHEET.get());
+                output.accept(PropulsionItems.RAW_PLATINUM.get());
+                output.accept(PropulsionItems.CRUSHED_RAW_PLATINUM.get());
+                output.accept(PropulsionItems.CORAL_BUCKET.get());
             }
         }
 }

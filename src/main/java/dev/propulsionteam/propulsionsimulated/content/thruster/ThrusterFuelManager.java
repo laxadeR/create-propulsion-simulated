@@ -99,7 +99,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
 
     public static float getEfficiency(Fluid fluid) {
         if (fluid == null || fluid == Fluids.EMPTY) {
-            return PropulsionConfig.FUEL_DEFAULT_EFFICIENCY.get().floatValue();
+            return 1.0f;
         }
 
         // Normalize flowing variants (e.g. flowing_lava) to their source fluid ids.
@@ -109,10 +109,10 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
 
         ResourceLocation fluidId = BuiltInRegistries.FLUID.getKey(fluid);
         if (fluidId == null) {
-            return PropulsionConfig.FUEL_DEFAULT_EFFICIENCY.get().floatValue();
+            return 1.0f;
         }
 
-        return fluidEfficiencyOverrides.getOrDefault(fluidId, PropulsionConfig.FUEL_DEFAULT_EFFICIENCY.get().floatValue());
+        return fluidEfficiencyOverrides.getOrDefault(fluidId, 1.0f);
     }
 
     @Override
@@ -198,6 +198,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
 
     private Map<Fluid, FluidThrusterProperties> parseFuelProperties(@Nonnull Map<ResourceLocation, JsonElement> pObject) {
         Map<Fluid, FluidThrusterProperties> newMap = new HashMap<>();
+        Map<ResourceLocation, Float> consumptionOverrides = getConfiguredConsumptionOverrides();
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
             ResourceLocation file = entry.getKey();
@@ -224,6 +225,17 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
                         definition.overrideTextures(),
                         definition.overrideColor().map(ThrusterFuelManager::sanitizeColor).orElse(null),
                         definition.useFluidColor());
+
+                    ResourceLocation fluidId = BuiltInRegistries.FLUID.getKey(fluid);
+                    if (fluidId != null && consumptionOverrides.containsKey(fluidId)) {
+                            properties = new FluidThrusterProperties(
+                            properties.thrustMultiplier(),
+                            consumptionOverrides.get(fluidId),
+                            properties.particleType(),
+                            properties.overrideTextures(),
+                            properties.overrideColor(),
+                            properties.useFluidColor());
+                    }
                     newMap.put(fluid, properties);
                 });
         }
@@ -233,41 +245,80 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
 
     private static Map<ResourceLocation, Float> getConfiguredEfficiencyOverrides() {
         Map<ResourceLocation, Float> overrides = new HashMap<>();
-        putEfficiencyOverride(overrides, "minecraft:lava", PropulsionConfig.FUEL_EFFICIENCY_LAVA.get());
-        putEfficiencyOverride(overrides, "createpropulsion:turpentine", PropulsionConfig.FUEL_EFFICIENCY_TURPENTINE.get());
-        putEfficiencyOverride(overrides, "createdieselgenerators:diesel", PropulsionConfig.FUEL_EFFICIENCY_CDG_DIESEL.get());
-        putEfficiencyOverride(overrides, "createdieselgenerators:gasoline", PropulsionConfig.FUEL_EFFICIENCY_CDG_GASOLINE.get());
-        putEfficiencyOverride(overrides, "createdieselgenerators:ethanol", PropulsionConfig.FUEL_EFFICIENCY_CDG_ETHANOL.get());
-        putEfficiencyOverride(overrides, "createdieselgenerators:biodiesel", PropulsionConfig.FUEL_EFFICIENCY_CDG_BIODIESEL.get());
-        putEfficiencyOverride(overrides, "createdieselgenerators:plant_oil", PropulsionConfig.FUEL_EFFICIENCY_CDG_PLANT_OIL.get());
-        putEfficiencyOverride(overrides, "tfmg:diesel", PropulsionConfig.FUEL_EFFICIENCY_TFMG_DIESEL.get());
-        putEfficiencyOverride(overrides, "tfmg:gasoline", PropulsionConfig.FUEL_EFFICIENCY_TFMG_GASOLINE.get());
-        putEfficiencyOverride(overrides, "tfmg:kerosene", PropulsionConfig.FUEL_EFFICIENCY_TFMG_KEROSENE.get());
-        putEfficiencyOverride(overrides, "tfmg:naphtha", PropulsionConfig.FUEL_EFFICIENCY_TFMG_NAPHTHA.get());
-        putEfficiencyOverride(overrides, "immersiveengineering:biodiesel", PropulsionConfig.FUEL_EFFICIENCY_IE_BIODIESEL.get());
-        putEfficiencyOverride(overrides, "immersiveengineering:ethanol", PropulsionConfig.FUEL_EFFICIENCY_IE_ETHANOL.get());
-        putEfficiencyOverride(overrides, "immersiveengineering:plant_oil", PropulsionConfig.FUEL_EFFICIENCY_IE_PLANT_OIL.get());
-        putEfficiencyOverride(overrides, "immersivepetroleum:diesel", PropulsionConfig.FUEL_EFFICIENCY_IP_DIESEL.get());
-        putEfficiencyOverride(overrides, "immersivepetroleum:diesel_sulfur", PropulsionConfig.FUEL_EFFICIENCY_IP_DIESEL_SULFUR.get());
-        putEfficiencyOverride(overrides, "immersivepetroleum:gasoline", PropulsionConfig.FUEL_EFFICIENCY_IP_GASOLINE.get());
-        putEfficiencyOverride(overrides, "mekanism:hydrogen", PropulsionConfig.FUEL_EFFICIENCY_MEKANISM_HYDROGEN.get());
-        putEfficiencyOverride(overrides, "mekanismgenerators:bioethanol", PropulsionConfig.FUEL_EFFICIENCY_MEKANISM_GENERATORS_BIOETHANOL.get());
-        putEfficiencyOverride(overrides, "northstar:biofuel", PropulsionConfig.FUEL_EFFICIENCY_NORTHSTAR_BIOFUEL.get());
-        putEfficiencyOverride(overrides, "northstar:hydrocarbon", PropulsionConfig.FUEL_EFFICIENCY_NORTHSTAR_HYDROCARBON.get());
-        putEfficiencyOverride(overrides, "northstar:methane", PropulsionConfig.FUEL_EFFICIENCY_NORTHSTAR_METHANE.get());
-        putEfficiencyOverride(overrides, "northstar:liquid_hydrogen", PropulsionConfig.FUEL_EFFICIENCY_NORTHSTAR_LIQUID_HYDROGEN.get());
-        putEfficiencyOverride(overrides, "stellaris:fuel", PropulsionConfig.FUEL_EFFICIENCY_STELLARIS_FUEL.get());
-        putEfficiencyOverride(overrides, "stellaris:diesel", PropulsionConfig.FUEL_EFFICIENCY_STELLARIS_DIESEL.get());
+        for (String rawEntry : PropulsionConfig.getFuelEfficiencyRatesOrDefault()) {
+            if (rawEntry == null) {
+                continue;
+            }
+            String entry = rawEntry.trim();
+            int separator = entry.indexOf('=');
+            if (separator <= 0 || separator == entry.length() - 1) {
+                LOGGER.warn("[{}] Ignoring malformed fuel efficiency entry '{}'. Expected '<namespace:fluid>=<percent>'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            String fluidId = entry.substring(0, separator).trim();
+            String percentText = entry.substring(separator + 1).trim();
+            ResourceLocation rl = ResourceLocation.tryParse(fluidId);
+            if (rl == null) {
+                LOGGER.warn("[{}] Ignoring fuel efficiency entry with invalid fluid id '{}'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            float percent;
+            try {
+                percent = Float.parseFloat(percentText);
+            } catch (NumberFormatException e) {
+                LOGGER.warn("[{}] Ignoring fuel efficiency entry with invalid percent '{}'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            if (percent < 0.0f) {
+                LOGGER.warn("[{}] Ignoring fuel efficiency entry with negative percent '{}'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            overrides.put(rl, percent / 100.0f);
+        }
         return overrides;
     }
 
-    private static void putEfficiencyOverride(Map<ResourceLocation, Float> map, String fluidId, double value) {
-        ResourceLocation rl = ResourceLocation.tryParse(fluidId);
-        if (rl == null) {
-            LOGGER.warn("[{}] Invalid fluid id '{}' in hardcoded config mapping.", CreatePropulsion.ID, fluidId);
-            return;
+    private static Map<ResourceLocation, Float> getConfiguredConsumptionOverrides() {
+        Map<ResourceLocation, Float> overrides = new HashMap<>();
+        for (String rawEntry : PropulsionConfig.getFuelBurnRateRatesOrDefault()) {
+            if (rawEntry == null) {
+                continue;
+            }
+            String entry = rawEntry.trim();
+            int separator = entry.indexOf('=');
+            if (separator <= 0 || separator == entry.length() - 1) {
+                LOGGER.warn("[{}] Ignoring malformed fuel consumption entry '{}'. Expected '<namespace:fluid>=<percent>'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            String fluidId = entry.substring(0, separator).trim();
+            String percentText = entry.substring(separator + 1).trim();
+            ResourceLocation rl = ResourceLocation.tryParse(fluidId);
+            if (rl == null) {
+                LOGGER.warn("[{}] Ignoring fuel consumption entry with invalid fluid id '{}'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            float percent;
+            try {
+                percent = Float.parseFloat(percentText);
+            } catch (NumberFormatException e) {
+                LOGGER.warn("[{}] Ignoring fuel consumption entry with invalid percent '{}'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            if (percent < 0.0f) {
+                LOGGER.warn("[{}] Ignoring fuel consumption entry with negative percent '{}'.", CreatePropulsion.ID, rawEntry);
+                continue;
+            }
+
+            overrides.put(rl, percent / 100.0f);
         }
-        map.put(rl, (float) value);
+        return overrides;
     }
 
     private static void syncFuelDataToClients() {

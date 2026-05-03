@@ -4,6 +4,8 @@
     "createpropulsion:thruster",
     "createpropulsion:solid_burner",
     "createpropulsion:liquid_burner",
-    "createpropulsion:stirling_engine"
+    "createpropulsion:stirling_engine",
+    "createpropulsion:platinum_ore",
+    "createpropulsion:deepslate_platinum_ore"
   ]
 }

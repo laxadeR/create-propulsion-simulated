@@ -4,7 +4,9 @@ import dev.propulsionteam.propulsionsimulated.registries.PropulsionDefaultStress
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PropulsionConfig {
     public static final ModConfigSpec.Builder SERVER_BUILDER = new ModConfigSpec.Builder();
@@ -40,7 +42,6 @@ public class PropulsionConfig {
     public static final ModConfigSpec.DoubleValue GROUND_ROLLING_RESISTANCE;
     public static final ModConfigSpec.DoubleValue GROUNDED_SPEED_DEADZONE;
     public static final ModConfigSpec.DoubleValue GROUND_PROBE_DISTANCE;
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> FUEL_PROPERTIES;
     public static final ModConfigSpec.DoubleValue TILT_ADAPTER_MAX_ANGLE;
 
     // ── Legacy-style values kept for backward compat with other subsystems ──
@@ -75,32 +76,12 @@ public class PropulsionConfig {
 
     // Burners
     public static final ModConfigSpec.ConfigValue<Boolean> BURNERS_POWER_HEATED_MIXERS;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_DEFAULT_EFFICIENCY;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_LAVA;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_TURPENTINE;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_CDG_DIESEL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_CDG_GASOLINE;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_CDG_ETHANOL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_CDG_BIODIESEL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_CDG_PLANT_OIL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_TFMG_DIESEL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_TFMG_GASOLINE;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_TFMG_KEROSENE;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_TFMG_NAPHTHA;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_IE_BIODIESEL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_IE_ETHANOL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_IE_PLANT_OIL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_IP_DIESEL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_IP_DIESEL_SULFUR;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_IP_GASOLINE;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_MEKANISM_HYDROGEN;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_MEKANISM_GENERATORS_BIOETHANOL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_NORTHSTAR_BIOFUEL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_NORTHSTAR_HYDROCARBON;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_NORTHSTAR_METHANE;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_NORTHSTAR_LIQUID_HYDROGEN;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_STELLARIS_FUEL;
-    public static final ModConfigSpec.ConfigValue<Double>  FUEL_EFFICIENCY_STELLARIS_DIESEL;
+    public static final ModConfigSpec.DoubleValue FUEL_DEFAULT_EFFICIENCY;
+    public static final ModConfigSpec.DoubleValue FUEL_DEFAULT_BURN_RATE;
+    public static final ModConfigSpec.IntValue CORAL_DEFAULT_FE_PER_MB;
+    private static final Map<String, ModConfigSpec.DoubleValue> FUEL_EFFICIENCY_OVERRIDES = new LinkedHashMap<>();
+    private static final Map<String, ModConfigSpec.DoubleValue> FUEL_BURN_RATE_OVERRIDES = new LinkedHashMap<>();
+    private static final Map<String, ModConfigSpec.IntValue> CORAL_FUEL_CONVERSION_OVERRIDES = new LinkedHashMap<>();
 
     static {
         //#region Server
@@ -117,64 +98,13 @@ public class PropulsionConfig {
                 .defineInRange("fuelTankCapacityMb", 250, 250, 64000);
         THRUSTER_MAX_SPEED = SERVER_BUILDER.comment("Standard thruster speed limit in blocks per second.")
                 .defineInRange("thrusterMaxSpeed", 600, 1, 10000000);
-        CREATIVE_THRUSTER_MAX_SPEED = SERVER_BUILDER.comment("Creative thruster speed limit in blocks per second.")
-                .defineInRange("creativeThrusterMaxSpeed", 10000, 1, 100000);
-        ION_THRUSTER_MAX_SPEED = SERVER_BUILDER.comment("Ion thruster speed limit in blocks per second.")
-                .defineInRange("ionThrusterMaxSpeed", 1000, 1, 10000000);
-        ION_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Ion thruster maximum thrust cap in pN.")
-                .defineInRange("ionThrusterMaxThrust", 1000.0d, 1.0d, 10_000_000.0d);
-        CREATIVE_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Creative thruster max thrust in pN.")
-                .defineInRange("creativeThrusterMaxThrust", 10000.0d, 10.0d, 1000000.0d);
-        CREATIVE_VECTOR_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Creative vector thruster max thrust in pN.")
-                .defineInRange("creativeVectorThrusterMaxThrust", 10000.0d, 10.0d, 1000000.0d);
         FUEL_MB_PER_TICK_AT_FULL_THROTTLE = SERVER_BUILDER.comment("Fuel consumption in millibuckets per tick at full redstone throttle.")
                 .defineInRange("fuelMbPerTickAtFullThrottle", 1.0d, 0.0001d, 1000.0d);
-        ION_THRUSTER_ENERGY_CAPACITY_FE = SERVER_BUILDER.comment("Ion thruster internal FE capacity.")
-                .defineInRange("ionThrusterEnergyCapacityFe", 1000, 1, 100000000);
-        ION_THRUSTER_FE_PER_TICK_AT_FULL_THROTTLE = SERVER_BUILDER.comment("Ion thruster energy consumption in FE per tick at full redstone throttle.")
-                .defineInRange("ionThrusterFePerTickAtFullThrottle", 80.0d, 0.0001d, 1000000.0d);
-        ION_THRUSTER_BASE_THRUST = SERVER_BUILDER.comment("Ion thruster base thrust at redstone 15 and full obstruction efficiency.")
-                .defineInRange("ionThrusterBaseThrust", 1000.d, 1.d, 10000000.d);
-        VECTOR_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Vector thruster maximum thrust cap in pN.")
-                .defineInRange("vectorThrusterMaxThrust", 900.0d, 1.0d, 10_000_000.0d);
-        VECTOR_THRUSTER_BASE_THRUST = SERVER_BUILDER.comment("Vector thruster base thrust at redstone 15 and full obstruction efficiency.")
-                .defineInRange("vectorThrusterBaseThrust", 900.0d, 1.0d, 10000000.0d);
         DAMAGE_ENTITIES = SERVER_BUILDER.comment("If true, entities inside active thruster plume are damaged.")
                 .define("damageEntities", true);
-        DAMAGE_TICK_INTERVAL = SERVER_BUILDER.comment("How often plume damage checks run, in ticks.")
-                .defineInRange("damageTickInterval", 5, 1, 40);
-        NOZZLE_OFFSET_FROM_CENTER = SERVER_BUILDER.comment("Offset from the block center where force is applied.")
-                .defineInRange("nozzleOffsetFromCenter", 0.45d, 0.0d, 1.5d);
-        USE_ATMOSPHERIC_PRESSURE = SERVER_BUILDER.comment("If true, atmospheric pressure affects thruster output at altitude.")
-                .define("useAtmosphericPressure", false);
-        ATMOSPHERIC_PRESSURE_AMOUNT = SERVER_BUILDER.comment("Strength of atmospheric pressure influence. 1.0 = full effect, 0.0 = no effect.")
-                .defineInRange("atmosphericPressureAmount", 1.0d, 0.0d, 2.0d);
+
         CLIENT_PARTICLES_PER_TICK = SERVER_BUILDER.comment("Max client particles per tick while active.")
                 .defineInRange("clientParticlesPerTick", 4, 0, 64);
-        GROUND_FRICTION_COEFFICIENT = SERVER_BUILDER.comment("Ground friction coefficient applied while a thruster detects support under it.")
-                .defineInRange("groundFrictionCoefficient", 0.08d, 0.0d, 5.0d);
-        GROUND_LINEAR_DRAG = SERVER_BUILDER.comment("Grounded linear drag coefficient in pN per m/s.")
-                .defineInRange("groundLinearDrag", 180.0d, 0.0d, 10_000.0d);
-        GROUND_ROLLING_RESISTANCE = SERVER_BUILDER.comment("Additional grounded rolling resistance in pN.")
-                .defineInRange("groundRollingResistance", 80.0d, 0.0d, 10_000.0d);
-        GROUNDED_SPEED_DEADZONE = SERVER_BUILDER.comment("Horizontal speed below this value is treated as stopped for grounded drag.")
-                .defineInRange("groundedSpeedDeadzone", 0.03d, 0.0d, 5.0d);
-        GROUND_PROBE_DISTANCE = SERVER_BUILDER.comment("How far downward a thruster probes to detect grounded support.")
-                .defineInRange("groundProbeDistance", 1.5d, 0.05d, 5.0d);
-
-        SERVER_BUILDER.push("fuelTable");
-        FUEL_PROPERTIES = SERVER_BUILDER.comment(
-                        "Fuel table entries as '<namespace:fluid>=<thrust_percent>,<burn_rate_percent>'.",
-                        "Example: createpropulsion:turpentine=80,120"
-                )
-                .defineListAllowEmpty("fuelProperties", PropulsionConfig::defaultFuelProperties, () -> "",
-                        value -> value instanceof String);
-        SERVER_BUILDER.pop();
-
-        SERVER_BUILDER.push("tiltAdapter");
-        TILT_ADAPTER_MAX_ANGLE = SERVER_BUILDER.comment("Maximum angle the tilt adapter can rotate to, in degrees.")
-                .defineInRange("tiltAdapterMaxAngle", 90.0d, 0.0d, 180.0d);
-        SERVER_BUILDER.pop();
 
         // Legacy compatibility values (used by other subsystems in this mod)
         THRUSTER_THRUST_MULTIPLIER = SERVER_BUILDER.comment("Thrust is multiplied by that.")
@@ -188,9 +118,59 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.pop(); // thruster
 
+        SERVER_BUILDER.push("ionThruster");
+        ION_THRUSTER_MAX_SPEED = SERVER_BUILDER.comment("Ion thruster speed limit in blocks per second.")
+                .defineInRange("ionThrusterMaxSpeed", 1000, 1, 10000000);
+        ION_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Ion thruster maximum thrust cap in pN.")
+                .defineInRange("ionThrusterMaxThrust", 1000.0d, 1.0d, 10_000_000.0d);
+        ION_THRUSTER_ENERGY_CAPACITY_FE = SERVER_BUILDER.comment("Ion thruster internal FE capacity.")
+                .defineInRange("ionThrusterEnergyCapacityFe", 1000, 1, 100000000);
+        ION_THRUSTER_FE_PER_TICK_AT_FULL_THROTTLE = SERVER_BUILDER.comment("Ion thruster energy consumption in FE per tick at full redstone throttle.")
+                .defineInRange("ionThrusterFePerTickAtFullThrottle", 80.0d, 0.0001d, 1000000.0d);
+        ION_THRUSTER_BASE_THRUST = SERVER_BUILDER.comment("Ion thruster base thrust at redstone 15 and full obstruction efficiency.")
+                .defineInRange("ionThrusterBaseThrust", 1000.d, 1.d, 10000000.d);
+        SERVER_BUILDER.pop();
+
         SERVER_BUILDER.push("Creative Thruster");
             CREATIVE_THRUSTER_THRUST_MULTIPLIER = SERVER_BUILDER.comment("Thrust is multiplied by that.")
                 .define("Creative thrust multiplier", 1.0);
+            CREATIVE_THRUSTER_MAX_SPEED = SERVER_BUILDER.comment("Creative thruster speed limit in blocks per second.")
+                .defineInRange("creativeThrusterMaxSpeed", 10000, 1, 100000);
+            CREATIVE_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Creative thruster max thrust in pN.")
+                .defineInRange("creativeThrusterMaxThrust", 10000.0d, 10.0d, 1000000.0d);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("vectorThruster");
+            VECTOR_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Vector thruster maximum thrust cap in pN.")
+                .defineInRange("vectorThrusterMaxThrust", 900.0d, 1.0d, 10_000_000.0d);
+            VECTOR_THRUSTER_BASE_THRUST = SERVER_BUILDER.comment("Vector thruster base thrust at redstone 15 and full obstruction efficiency.")
+                .defineInRange("vectorThrusterBaseThrust", 900.0d, 1.0d, 10000000.0d);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("creativeVectorThruster");
+            CREATIVE_VECTOR_THRUSTER_MAX_THRUST = SERVER_BUILDER.comment("Creative vector thruster max thrust in pN.")
+                .defineInRange("creativeVectorThrusterMaxThrust", 10000.0d, 10.0d, 1000000.0d);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("physics");
+            DAMAGE_TICK_INTERVAL = SERVER_BUILDER.comment("How often plume damage checks run, in ticks.")
+                .defineInRange("damageTickInterval", 5, 1, 40);
+            NOZZLE_OFFSET_FROM_CENTER = SERVER_BUILDER.comment("Offset from the block center where force is applied.")
+                .defineInRange("nozzleOffsetFromCenter", 0.45d, 0.0d, 1.5d);
+            USE_ATMOSPHERIC_PRESSURE = SERVER_BUILDER.comment("If true, atmospheric pressure affects thruster output at altitude.")
+                .define("useAtmosphericPressure", false);
+            ATMOSPHERIC_PRESSURE_AMOUNT = SERVER_BUILDER.comment("Strength of atmospheric pressure influence. 1.0 = full effect, 0.0 = no effect.")
+                .defineInRange("atmosphericPressureAmount", 1.0d, 0.0d, 2.0d);
+            GROUND_FRICTION_COEFFICIENT = SERVER_BUILDER.comment("Ground friction coefficient applied while a thruster detects support under it.")
+                .defineInRange("groundFrictionCoefficient", 0.08d, 0.0d, 5.0d);
+            GROUND_LINEAR_DRAG = SERVER_BUILDER.comment("Grounded linear drag coefficient in pN per m/s.")
+                .defineInRange("groundLinearDrag", 180.0d, 0.0d, 10_000.0d);
+            GROUND_ROLLING_RESISTANCE = SERVER_BUILDER.comment("Additional grounded rolling resistance in pN.")
+                .defineInRange("groundRollingResistance", 80.0d, 0.0d, 10_000.0d);
+            GROUNDED_SPEED_DEADZONE = SERVER_BUILDER.comment("Horizontal speed below this value is treated as stopped for grounded drag.")
+                .defineInRange("groundedSpeedDeadzone", 0.03d, 0.0d, 5.0d);
+            GROUND_PROBE_DISTANCE = SERVER_BUILDER.comment("How far downward a thruster probes to detect grounded support.")
+                .defineInRange("groundProbeDistance", 1.5d, 0.05d, 5.0d);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Optical sensors");
@@ -215,6 +195,8 @@ public class PropulsionConfig {
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Tilt Adapter");
+            TILT_ADAPTER_MAX_ANGLE = SERVER_BUILDER.comment("Maximum angle the tilt adapter can rotate to, in degrees.")
+                .defineInRange("tiltAdapterMaxAngle", 90.0d, 0.0d, 180.0d);
             TILT_ADAPTER_ANGLE_RANGE = SERVER_BUILDER.comment("Maximum absolute output angle in degrees, reached at full redstone differential.")
                 .defineInRange("Maximum angle range", 90.0, 0.0, 180.0);
         SERVER_BUILDER.pop();
@@ -224,60 +206,47 @@ public class PropulsionConfig {
                 .define("Burners power heated mixers", true);
         SERVER_BUILDER.pop();
 
-        SERVER_BUILDER.push("Fuel Efficiency");
-            FUEL_DEFAULT_EFFICIENCY = SERVER_BUILDER.comment("Default fluid efficiency multiplier. 1.0 = 100%.")
-                .defineInRange("Default efficiency", 1.0, 0.01, 10.0);
-            SERVER_BUILDER.push("Fluid Overrides");
-                FUEL_EFFICIENCY_LAVA = SERVER_BUILDER.comment("minecraft:lava")
-                    .defineInRange("Lava", 0.75, 0.01, 10.0);
-                FUEL_EFFICIENCY_TURPENTINE = SERVER_BUILDER.comment("createpropulsion:turpentine")
-                    .defineInRange("Turpentine", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_CDG_DIESEL = SERVER_BUILDER.comment("createdieselgenerators:diesel")
-                    .defineInRange("CDG Diesel", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_CDG_GASOLINE = SERVER_BUILDER.comment("createdieselgenerators:gasoline")
-                    .defineInRange("CDG Gasoline", 1.1, 0.01, 10.0);
-                FUEL_EFFICIENCY_CDG_ETHANOL = SERVER_BUILDER.comment("createdieselgenerators:ethanol")
-                    .defineInRange("CDG Ethanol", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_CDG_BIODIESEL = SERVER_BUILDER.comment("createdieselgenerators:biodiesel")
-                    .defineInRange("CDG Biodiesel", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_CDG_PLANT_OIL = SERVER_BUILDER.comment("createdieselgenerators:plant_oil")
-                    .defineInRange("CDG Plant Oil", 0.9, 0.01, 10.0);
-                FUEL_EFFICIENCY_TFMG_DIESEL = SERVER_BUILDER.comment("tfmg:diesel")
-                    .defineInRange("TFMG Diesel", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_TFMG_GASOLINE = SERVER_BUILDER.comment("tfmg:gasoline")
-                    .defineInRange("TFMG Gasoline", 1.1, 0.01, 10.0);
-                FUEL_EFFICIENCY_TFMG_KEROSENE = SERVER_BUILDER.comment("tfmg:kerosene")
-                    .defineInRange("TFMG Kerosene", 1.05, 0.01, 10.0);
-                FUEL_EFFICIENCY_TFMG_NAPHTHA = SERVER_BUILDER.comment("tfmg:naphtha")
-                    .defineInRange("TFMG Naphtha", 0.95, 0.01, 10.0);
-                FUEL_EFFICIENCY_IE_BIODIESEL = SERVER_BUILDER.comment("immersiveengineering:biodiesel")
-                    .defineInRange("IE Biodiesel", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_IE_ETHANOL = SERVER_BUILDER.comment("immersiveengineering:ethanol")
-                    .defineInRange("IE Ethanol", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_IE_PLANT_OIL = SERVER_BUILDER.comment("immersiveengineering:plant_oil")
-                    .defineInRange("IE Plant Oil", 0.9, 0.01, 10.0);
-                FUEL_EFFICIENCY_IP_DIESEL = SERVER_BUILDER.comment("immersivepetroleum:diesel")
-                    .defineInRange("IP Diesel", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_IP_DIESEL_SULFUR = SERVER_BUILDER.comment("immersivepetroleum:diesel_sulfur")
-                    .defineInRange("IP Sulfur Diesel", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_IP_GASOLINE = SERVER_BUILDER.comment("immersivepetroleum:gasoline")
-                    .defineInRange("IP Gasoline", 1.1, 0.01, 10.0);
-                FUEL_EFFICIENCY_MEKANISM_HYDROGEN = SERVER_BUILDER.comment("mekanism:hydrogen")
-                    .defineInRange("Mekanism Hydrogen", 1.2, 0.01, 10.0);
-                FUEL_EFFICIENCY_MEKANISM_GENERATORS_BIOETHANOL = SERVER_BUILDER.comment("mekanismgenerators:bioethanol")
-                    .defineInRange("Mekanism Generators Bioethanol", 1.35, 0.01, 10.0);
-                FUEL_EFFICIENCY_NORTHSTAR_BIOFUEL = SERVER_BUILDER.comment("northstar:biofuel")
-                    .defineInRange("Northstar Biofuel", 1.0, 0.01, 10.0);
-                FUEL_EFFICIENCY_NORTHSTAR_HYDROCARBON = SERVER_BUILDER.comment("northstar:hydrocarbon")
-                    .defineInRange("Northstar Hydrocarbon", 1.1, 0.01, 10.0);
-                FUEL_EFFICIENCY_NORTHSTAR_METHANE = SERVER_BUILDER.comment("northstar:methane")
-                    .defineInRange("Northstar Methane", 1.05, 0.01, 10.0);
-                FUEL_EFFICIENCY_NORTHSTAR_LIQUID_HYDROGEN = SERVER_BUILDER.comment("northstar:liquid_hydrogen")
-                    .defineInRange("Northstar Liquid Hydrogen", 1.25, 0.01, 10.0);
-                FUEL_EFFICIENCY_STELLARIS_FUEL = SERVER_BUILDER.comment("stellaris:fuel")
-                    .defineInRange("Stellaris Fuel", 1.2, 0.01, 10.0);
-                FUEL_EFFICIENCY_STELLARIS_DIESEL = SERVER_BUILDER.comment("stellaris:diesel")
-                    .defineInRange("Stellaris Diesel", 1.0, 0.01, 10.0);
+        SERVER_BUILDER.push("Fuel Configuration");
+            SERVER_BUILDER.push("Fuel Efficiency");
+                FUEL_DEFAULT_EFFICIENCY = SERVER_BUILDER.comment("Default efficiency percent used when no fluid override exists.")
+                    .defineInRange("Default", 100.0d, 0.0d, 10000.0d);
+                SERVER_BUILDER.push("Fluid Overrides");
+                    for (Map.Entry<String, Integer> entry : parsePercentDefaults(defaultFuelEfficiencyRates()).entrySet()) {
+                        FUEL_EFFICIENCY_OVERRIDES.put(
+                            entry.getKey(),
+                            SERVER_BUILDER.comment(entry.getKey())
+                                .defineInRange(configKeyForFluid(entry.getKey()), entry.getValue().doubleValue(), 0.0d, 10000.0d)
+                        );
+                    }
+                SERVER_BUILDER.pop();
+            SERVER_BUILDER.pop();
+
+            SERVER_BUILDER.push("Fuel Burn Rate");
+                FUEL_DEFAULT_BURN_RATE = SERVER_BUILDER.comment("Default burn-rate percent used when no fluid override exists.")
+                    .defineInRange("Default", 100.0d, 0.0d, 10000.0d);
+                SERVER_BUILDER.push("Fluid Overrides");
+                    for (Map.Entry<String, Integer> entry : parsePercentDefaults(defaultFuelBurnRateRates()).entrySet()) {
+                        FUEL_BURN_RATE_OVERRIDES.put(
+                            entry.getKey(),
+                            SERVER_BUILDER.comment(entry.getKey())
+                                .defineInRange(configKeyForFluid(entry.getKey()), entry.getValue().doubleValue(), 0.0d, 10000.0d)
+                        );
+                    }
+                SERVER_BUILDER.pop();
+            SERVER_BUILDER.pop();
+
+            SERVER_BUILDER.push("Coral Conversion Rate");
+                CORAL_DEFAULT_FE_PER_MB = SERVER_BUILDER.comment("Default FE/mB used when no coral fluid override exists.")
+                    .defineInRange("Default", 16, 0, 1_000_000);
+                SERVER_BUILDER.push("Fluid Overrides");
+                    for (Map.Entry<String, Integer> entry : parsePercentDefaults(defaultCoralFuelConversionRates()).entrySet()) {
+                        CORAL_FUEL_CONVERSION_OVERRIDES.put(
+                            entry.getKey(),
+                            SERVER_BUILDER.comment(entry.getKey())
+                                .defineInRange(configKeyForFluid(entry.getKey()), entry.getValue(), 0, 1_000_000)
+                        );
+                    }
+                SERVER_BUILDER.pop();
             SERVER_BUILDER.pop();
         SERVER_BUILDER.pop();
 
@@ -344,5 +313,128 @@ public class PropulsionConfig {
                 "northstar:liquid_hydrogen=125,80",
                 "immersivepetroleum:diesel_sulfur=100,100"
         );
+    }
+
+    private static List<String> defaultCoralFuelConversionRates() {
+        return List.of("createpropulsion:coral=16");
+    }
+
+    private static List<String> defaultFuelEfficiencyRates() {
+        return List.of(
+                "createpropulsion:turpentine=80",
+                "minecraft:lava=75",
+                "createdieselgenerators:plant_oil=55",
+                "immersiveengineering:plantoil=55",
+                "createdieselgenerators:ethanol=70",
+                "immersiveengineering:ethanol=70",
+                "mekanismgenerators:bioethanol=75",
+                "northstar:biofuel=80",
+                "createdieselgenerators:biodiesel=90",
+                "immersiveengineering:biodiesel=90",
+                "immersiveengineering:high_power_biodiesel=105",
+                "createdieselgenerators:diesel=100",
+                "tfmg:diesel=100",
+                "stellaris:diesel=100",
+                "tfmg:naphtha=95",
+                "tfmg:kerosene=115",
+                "createdieselgenerators:gasoline=125",
+                "tfmg:gasoline=125",
+                "tfmg:lpg=120",
+                "northstar:hydrocarbon=130",
+                "stellaris:fuel=115",
+                "mekanism:hydrogen=120",
+                "createaddition:bioethanol=75",
+                "createaddition:seed_oil=55",
+                "northstar:methane=105",
+                "northstar:liquid_hydrogen=125",
+                "immersivepetroleum:diesel_sulfur=100"
+        );
+    }
+
+    private static List<String> defaultFuelBurnRateRates() {
+        return List.of(
+                "createpropulsion:turpentine=120",
+                "minecraft:lava=100",
+                "createdieselgenerators:plant_oil=170",
+                "immersiveengineering:plantoil=170",
+                "createdieselgenerators:ethanol=140",
+                "immersiveengineering:ethanol=140",
+                "mekanismgenerators:bioethanol=135",
+                "northstar:biofuel=125",
+                "createdieselgenerators:biodiesel=110",
+                "immersiveengineering:biodiesel=110",
+                "immersiveengineering:high_power_biodiesel=95",
+                "createdieselgenerators:diesel=100",
+                "tfmg:diesel=100",
+                "stellaris:diesel=100",
+                "tfmg:naphtha=105",
+                "tfmg:kerosene=90",
+                "createdieselgenerators:gasoline=80",
+                "tfmg:gasoline=80",
+                "tfmg:lpg=85",
+                "northstar:hydrocarbon=75",
+                "stellaris:fuel=100",
+                "mekanism:hydrogen=80",
+                "createaddition:bioethanol=135",
+                "createaddition:seed_oil=170",
+                "northstar:methane=95",
+                "northstar:liquid_hydrogen=80",
+                "immersivepetroleum:diesel_sulfur=100"
+        );
+    }
+
+    private static Map<String, Integer> parsePercentDefaults(List<String> entries) {
+        Map<String, Integer> parsed = new LinkedHashMap<>();
+        for (String entry : entries) {
+            int separator = entry.indexOf('=');
+            if (separator <= 0 || separator >= entry.length() - 1) {
+                continue;
+            }
+            String fluidId = entry.substring(0, separator).trim();
+            String valuePart = entry.substring(separator + 1).trim();
+            int comma = valuePart.indexOf(',');
+            if (comma >= 0) {
+                valuePart = valuePart.substring(0, comma).trim();
+            }
+            try {
+                parsed.put(fluidId, Integer.parseInt(valuePart));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return parsed;
+    }
+
+    private static String configKeyForFluid(String fluidId) {
+        return fluidId.replace(':', '_').replace('/', '_').replace('.', '_').replace('-', '_');
+    }
+
+    public static List<String> getCoralFuelConversionRatesOrDefault() {
+        try {
+            return CORAL_FUEL_CONVERSION_OVERRIDES.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue().get())
+                .toList();
+        } catch (IllegalStateException ignored) {
+            return defaultCoralFuelConversionRates();
+        }
+    }
+
+    public static List<String> getFuelBurnRateRatesOrDefault() {
+        try {
+            return FUEL_BURN_RATE_OVERRIDES.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue().get().intValue())
+                .toList();
+        } catch (IllegalStateException ignored) {
+            return defaultFuelBurnRateRates();
+        }
+    }
+
+    public static List<String> getFuelEfficiencyRatesOrDefault() {
+        try {
+            return FUEL_EFFICIENCY_OVERRIDES.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue().get().intValue())
+                .toList();
+        } catch (IllegalStateException ignored) {
+            return defaultFuelEfficiencyRates();
+        }
     }
 }
