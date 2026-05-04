@@ -107,6 +107,7 @@
     "createpropulsion.tooltip.airflow": "Airflow: ",
     "createpropulsion.tooltip.thrust1": "Thrust: ",
     "createpropulsion.thruster.tooltip.summary": "Provides directional thrust when powered by redstone and fueled with Turpentine.",
+    "createpropulsion.redstone_converter.tooltip.summary": "Converts redstone signal strength into a configurable redstone output signal.",
     "createpropulsion.creative_thruster.tooltip.summary": "Infinite-fuel thruster with configurable output and particle mode cycling via wrench.",
     "createpropulsion.ion_thruster.tooltip.summary": "Provides directional thrust when powered by redstone and supplied with FE energy.",
     "createpropulsion.vector_thruster.tooltip.summary": "Directional thruster that can also yaw and pitch for vectored thrust control.",
