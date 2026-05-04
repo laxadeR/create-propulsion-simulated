@@ -7,6 +7,7 @@ import dev.propulsionteam.propulsionsimulated.content.cable.fe.FeCableBlock;
 import dev.propulsionteam.propulsionsimulated.content.cable.hub.CableHubBlock;
 import dev.propulsionteam.propulsionsimulated.content.heat.engine.StirlingEngineBlock;
 import dev.propulsionteam.propulsionsimulated.content.platinum.CoralGeneratorBlock;
+import dev.propulsionteam.propulsionsimulated.content.redstone_converter.RedstoneConverterBlock;
 import dev.propulsionteam.propulsionsimulated.content.redstone_transmission.RedstoneTransmissionBlock;
 import dev.propulsionteam.propulsionsimulated.content.tilt_adapter.TiltAdapterBlock;
 import dev.propulsionteam.propulsionsimulated.content.thruster.creative_thruster.CreativeThrusterBlock;
@@ -46,6 +47,9 @@ public class PropulsionBlocks {
     public static final DeferredBlock<CreativeVectorThrusterBlock> CREATIVE_VECTOR_THRUSTER_BLOCK = BLOCKS.register("creative_vector_thruster",
         () -> new CreativeVectorThrusterBlock(Block.Properties.of().mapColor(MapColor.METAL)
             .sound(SoundType.METAL).strength(5.5f, 4.0f).noOcclusion()));
+    public static final DeferredBlock<RedstoneConverterBlock> REDSTONE_CONVERTER_BLOCK = BLOCKS.register("redstone_converter",
+        () -> new RedstoneConverterBlock(Block.Properties.of().mapColor(MapColor.METAL)
+            .sound(SoundType.METAL).instabreak()));
     public static final DeferredBlock<RedstoneTransmissionBlock> REDSTONE_TRANSMISSION_BLOCK = BLOCKS.register("redstone_transmission",
         () -> new RedstoneTransmissionBlock(Block.Properties.of().mapColor(MapColor.PODZOL)
             .sound(SoundType.METAL).strength(2.5f, 2.0f).noOcclusion()));
@@ -102,6 +106,7 @@ public class PropulsionBlocks {
         registerBlockItem("ion_thruster", ION_THRUSTER_BLOCK, new BlockItem.Properties().rarity(Rarity.UNCOMMON));
         registerBlockItem("vector_thruster", VECTOR_THRUSTER_BLOCK, new BlockItem.Properties().rarity(Rarity.UNCOMMON));
         registerBlockItem("creative_vector_thruster", CREATIVE_VECTOR_THRUSTER_BLOCK, new BlockItem.Properties().rarity(Rarity.EPIC));
+        registerDefaultBlockItem("redstone_converter", REDSTONE_CONVERTER_BLOCK);
         registerDefaultBlockItem("redstone_transmission", REDSTONE_TRANSMISSION_BLOCK);
         registerDefaultBlockItem("solid_burner", SOLID_BURNER);
         registerDefaultBlockItem("liquid_burner", LIQUID_BURNER);

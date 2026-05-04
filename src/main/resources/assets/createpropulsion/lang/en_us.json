@@ -1,6 +1,8 @@
 {
     "createpropulsion.gui.goggles.burner.heat.cold": "Cold",
     "createpropulsion.gui.goggles.burner.heat.searing": "Searing",
+    "block.createpropulsion.redstone_converter": "Redstone Converter",
+    "createpropulsion.redstone_converter.output_strength": "Output Strength",
     "block.createpropulsion.redstone_transmission": "Redstone Transmission",
     "createpropulsion.ponder.shared.redstone_transmission_incremental.decrease_shift": "Input on the opposite side decreases shift.",
     "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Internal Shift",

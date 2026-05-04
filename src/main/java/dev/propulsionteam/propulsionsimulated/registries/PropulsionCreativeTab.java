@@ -44,6 +44,7 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionBlocks.CREATIVE_VECTOR_THRUSTER_BLOCK.get());
                 //From 0.2
                 output.accept(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK.get());
+                output.accept(PropulsionBlocks.REDSTONE_CONVERTER_BLOCK.get());
                 //From 0.2 (items)
                 output.accept(PropulsionItems.TURPENTINE_BUCKET.get());
                 output.accept(PropulsionItems.PINE_RESIN.get());
