@@ -214,6 +214,12 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Burners");
             BURNERS_POWER_HEATED_MIXERS = SERVER_BUILDER.comment("If true - both solid and liquid burners can provide heat to heated mixers allowing for pre-nether brass.")
                 .define("Burners power heated mixers", true);
+            BURNERS_HEAT_STEAM_ENGINES = SERVER_BUILDER.comment("Allow propulsion burners to heat Create steam engines.")
+                .define("Burners heat steam engines", true);
+            BURNERS_SUPERHEAT_STEAM_ENGINES = SERVER_BUILDER.comment("Allow seething burners to count as superheated for steam engines.")
+                .define("Burners superheat steam engines", true);
+            BLAZE_BURNERS_HEAT_STIRLING_ENGINES = SERVER_BUILDER.comment("Allow vanilla blaze burners under stirling engines to provide heat.")
+                .define("Blaze burners heat stirling engines", true);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Cable");
@@ -245,38 +251,39 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.pop();
 
+        SERVER_BUILDER.push("Thruster Particles");
+            THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = SERVER_BUILDER.comment("Particle additional velocity modifier when ship is moving in the same direction as exhaust.")
+                    .define("Particle velocity offset", 0.15);
+            THRUSTER_PARTICLE_COUNT_MULTIPLIER = SERVER_BUILDER.comment("The higher this number is - the more particles are spawned.")
+                    .define("Particle count multiplier", 1.0);
+            STANDARD_THRUSTER_PARTICLE_COUNT_MULTIPLIER = SERVER_BUILDER.comment("Particle count multiplier for standard thrusters.")
+                    .define("Standard thruster particle count multiplier", 1.0);
+            STANDARD_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = SERVER_BUILDER.comment("Particle velocity multiplier for standard thrusters.")
+                    .define("Standard thruster particle velocity multiplier", 1.0);
+            ION_THRUSTER_PARTICLE_COUNT_MULTIPLIER = SERVER_BUILDER.comment("Particle count multiplier for ion thrusters.")
+                    .define("Ion thruster particle count multiplier", 1.0);
+            ION_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = SERVER_BUILDER.comment("Particle velocity multiplier for ion thrusters.")
+                    .define("Ion thruster particle velocity multiplier", 1.0);
+            VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER = SERVER_BUILDER.comment("Particle count multiplier for vector thrusters.")
+                    .define("Vector thruster particle count multiplier", 1.0);
+            VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = SERVER_BUILDER.comment("Particle velocity multiplier for vector thrusters.")
+                    .define("Vector thruster particle velocity multiplier", 1.0);
+            CREATIVE_THRUSTER_PARTICLE_COUNT_MULTIPLIER = SERVER_BUILDER.comment("Particle count multiplier for creative thrusters.")
+                    .define("Creative thruster particle count multiplier", 1.0);
+            CREATIVE_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = SERVER_BUILDER.comment("Particle velocity multiplier for creative thrusters.")
+                    .define("Creative thruster particle velocity multiplier", 1.0);
+            CREATIVE_VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER = SERVER_BUILDER.comment("Particle count multiplier for creative vector thrusters.")
+                    .define("Creative vector thruster particle count multiplier", 1.0);
+            CREATIVE_VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = SERVER_BUILDER.comment("Particle velocity multiplier for creative vector thrusters.")
+                    .define("Creative vector thruster particle velocity multiplier", 1.0);
+        SERVER_BUILDER.pop();
+
         PropulsionDefaultStress.INSTANCE.registerAll(SERVER_BUILDER);
 
         SERVER_SPEC = SERVER_BUILDER.build();
         //#endregion
 
         //#region Client
-        CLIENT_BUILDER.push("Thruster");
-            THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = CLIENT_BUILDER.comment("Particle additional velocity modifier when ship is moving in the same direction as exhaust.")
-                    .define("Particle velocity offset", 0.15);
-            THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
-                    .define("Particle count multiplier", 1.0);
-            STANDARD_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("Particle count multiplier for standard thrusters.")
-                    .define("Standard thruster particle count multiplier", 1.0);
-            STANDARD_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Particle velocity multiplier for standard thrusters.")
-                    .define("Standard thruster particle velocity multiplier", 1.0);
-            ION_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("Particle count multiplier for ion thrusters.")
-                    .define("Ion thruster particle count multiplier", 1.0);
-            ION_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Particle velocity multiplier for ion thrusters.")
-                    .define("Ion thruster particle velocity multiplier", 1.0);
-            VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("Particle count multiplier for vector thrusters.")
-                    .define("Vector thruster particle count multiplier", 1.0);
-            VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Particle velocity multiplier for vector thrusters.")
-                    .define("Vector thruster particle velocity multiplier", 1.0);
-            CREATIVE_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("Particle count multiplier for creative thrusters.")
-                    .define("Creative thruster particle count multiplier", 1.0);
-            CREATIVE_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Particle velocity multiplier for creative thrusters.")
-                    .define("Creative thruster particle velocity multiplier", 1.0);
-            CREATIVE_VECTOR_THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("Particle count multiplier for creative vector thrusters.")
-                    .define("Creative vector thruster particle count multiplier", 1.0);
-            CREATIVE_VECTOR_THRUSTER_PARTICLE_VELOCITY_MULTIPLIER = CLIENT_BUILDER.comment("Particle velocity multiplier for creative vector thrusters.")
-                    .define("Creative vector thruster particle velocity multiplier", 1.0);
-        CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("Stirling Engine");
             STIRLING_REVOLUTION_PERIOD = CLIENT_BUILDER.comment("Revolution period of the simulated shaft (affects only piston movement).")
                 .define("Revolution period", 0.2);
@@ -294,14 +301,6 @@ public class PropulsionConfig {
                 .define("Magnet", false);
         CLIENT_BUILDER.pop();
 
-        CLIENT_BUILDER.push("Burners");
-            BURNERS_HEAT_STEAM_ENGINES = CLIENT_BUILDER.comment("Allow propulsion burners to heat Create steam engines.")
-                .define("Burners heat steam engines", true);
-            BURNERS_SUPERHEAT_STEAM_ENGINES = CLIENT_BUILDER.comment("Allow seething burners to count as superheated for steam engines.")
-                .define("Burners superheat steam engines", true);
-            BLAZE_BURNERS_HEAT_STIRLING_ENGINES = CLIENT_BUILDER.comment("Allow vanilla blaze burners under stirling engines to provide heat.")
-                .define("Blaze burners heat stirling engines", true);
-        CLIENT_BUILDER.pop();
 
         CLIENT_SPEC = CLIENT_BUILDER.build();
         //#endregion

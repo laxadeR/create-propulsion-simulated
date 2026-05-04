@@ -482,7 +482,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
         if (emptyBlocks == 0) return;
         float power = getPower();
 
-        // Dedicated servers do not load CLIENT_SPEC; still read defaults so tuning applies everywhere.
         double particleCountMultiplier = org.joml.Math.clamp(0.0d, PARTICLE_MULTIPLIER_CAP, getParticleCountMultiplier());
         if (particleCountMultiplier <= 0) return;
         double particleVelocityMultiplier = org.joml.Math.clamp(0.0d, PARTICLE_MULTIPLIER_CAP, getParticleVelocityMultiplier());

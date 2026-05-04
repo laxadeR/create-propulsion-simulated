@@ -15,6 +15,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -73,8 +74,18 @@ public class SolidBurnerBlock extends AbstractBurnerBlock {
             return false;
         }
 
-        if (level.isClientSide())
-            return true;
+        if (level.isClientSide()) {
+            // Mirror the server-side check read-only so we don't eat block placements
+            ItemStack stack = player.getItemInHand(hand);
+            if (level.getBlockEntity(pos) instanceof SolidBurnerBlockEntity blockEntity) {
+                BurnerFuelBehaviour behaviour = blockEntity.getBehaviour(BurnerFuelBehaviour.TYPE);
+                if (behaviour != null) {
+                    if (stack.isEmpty() && !behaviour.fuelStack.isEmpty()) return true;
+                    if (!stack.isEmpty() && stack.getBurnTime(RecipeType.SMELTING) > 0 && !stack.hasCraftingRemainingItem()) return true;
+                }
+            }
+            return false;
+        }
 
         if (level.getBlockEntity(pos) instanceof SolidBurnerBlockEntity blockEntity) {
             BurnerFuelBehaviour behaviour = blockEntity.getBehaviour(BurnerFuelBehaviour.TYPE);
