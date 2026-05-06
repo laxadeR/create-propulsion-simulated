@@ -23,7 +23,17 @@ public class PropulsionPartialModels {
     public static final PartialModel CREATIVE_THRUSTER_BRACKET = partial("creative_thruster_bracket");
     //Vector thruster
     public static final PartialModel VECTOR_THRUSTER_MOVING_ASSEMBLY = partial("vector_thruster_moving_assembly");
+    public static final PartialModel VECTOR_THRUSTER_BODY = partial("vector_thruster_body");
+    public static final PartialModel VECTOR_THRUSTER_FLAP_TOP = partial("vector_thruster_flap_top");
+    public static final PartialModel VECTOR_THRUSTER_FLAP_BOTTOM = partial("vector_thruster_flap_bottom");
+    public static final PartialModel VECTOR_THRUSTER_FLAP_LEFT = partial("vector_thruster_flap_left");
+    public static final PartialModel VECTOR_THRUSTER_FLAP_RIGHT = partial("vector_thruster_flap_right");
     public static final PartialModel CREATIVE_VECTOR_THRUSTER_MOVING_ASSEMBLY = partial("creative_vector_thruster_moving_assembly");
+    public static final PartialModel CREATIVE_VECTOR_THRUSTER_BODY = partial("creative_vector_thruster_body");
+    public static final PartialModel CREATIVE_VECTOR_THRUSTER_FLAP_TOP = partial("creative_vector_thruster_flap_top");
+    public static final PartialModel CREATIVE_VECTOR_THRUSTER_FLAP_BOTTOM = partial("creative_vector_thruster_flap_bottom");
+    public static final PartialModel CREATIVE_VECTOR_THRUSTER_FLAP_LEFT = partial("creative_vector_thruster_flap_left");
+    public static final PartialModel CREATIVE_VECTOR_THRUSTER_FLAP_RIGHT = partial("creative_vector_thruster_flap_right");
     //Multiblock thruster
     public static final PartialModel THRUSTER_MULTIBLOCK_2X2X2 = partial("thruster_multiblock_2x2x2");
     public static final PartialModel THRUSTER_MULTIBLOCK_3X3X3 = partial("thruster_multiblock_3x3x3");

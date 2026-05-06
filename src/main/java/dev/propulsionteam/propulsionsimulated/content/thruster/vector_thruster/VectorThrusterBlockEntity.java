@@ -44,6 +44,11 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
     private float prevVectorY;
     private float obstructionEfficiency = 1.0f;
 
+    // Flap animation: 0 = idle (wide), 1 = full throttle (narrow)
+    private float targetFlapProgress;
+    private float currentFlapProgress;
+    private float prevFlapProgress;
+
     public VectorThrusterBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state);
     }
@@ -117,6 +122,10 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
         return Mth.lerp(partialTick, prevVectorY, currentVectorY);
     }
 
+    public float getInterpolatedFlapProgress(float partialTick) {
+        return Mth.lerp(partialTick, prevFlapProgress, currentFlapProgress);
+    }
+
     /** Sets the four directional signals to produce the given -1..1 vector. */
     public void setVectorCoordinates(float x, float y) {
         westSignal = x > 0 ? Math.round(x * 15) : 0;
@@ -135,6 +144,11 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
         prevVectorY = currentVectorY;
         currentVectorX = tweenTowards(currentVectorX, targetVectorX);
         currentVectorY = tweenTowards(currentVectorY, targetVectorY);
+
+        targetFlapProgress = (float) getThrottle();
+        prevFlapProgress = currentFlapProgress;
+        currentFlapProgress = tweenTowards(currentFlapProgress, targetFlapProgress);
+
         super.tick();
     }
 
@@ -302,7 +316,9 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
 
     @Override
     protected ParticleOptions createParticleOptions() {
-        return new IonParticleData(List.of(), null, 0.85f);
+        // Particle narrows as the nozzle closes: 0.85 at idle, 0.35 at full throttle
+        float size = Mth.lerp(currentFlapProgress, 0.85f, 0.35f);
+        return new IonParticleData(List.of(), null, size);
     }
 
     // -----------------------------------------------------------------------
