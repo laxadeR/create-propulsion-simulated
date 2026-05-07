@@ -41,8 +41,9 @@ jobs:
             echo "No jar artifact found in build/libs"
             exit 1
           fi
+          MOD_VERSION=$(grep 'mod_version' gradle.properties | cut -d'=' -f2 | xargs)
           short_sha="${GITHUB_SHA:0:8}"
-          nightly_name="createpropulsion-nightly-${short_sha}.jar"
+          nightly_name="createpropulsion-nightly-${MOD_VERSION}-${short_sha}.jar"
           nightly_path="build/libs/${nightly_name}"
           cp "${artifact}" "${nightly_path}"
           echo "path=${nightly_path}" >> "${GITHUB_OUTPUT}"
