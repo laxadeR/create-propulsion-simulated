@@ -43,6 +43,7 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
     private float prevVectorX;
     private float prevVectorY;
     private float obstructionEfficiency = 1.0f;
+    private boolean clientInitialized = false;
 
     // Flap animation: 0 = idle (wide), 1 = full throttle (narrow)
     private float targetFlapProgress;
@@ -294,12 +295,15 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
         downSignal = compound.getInt("DownSignal");
         upSignal   = compound.getInt("UpSignal");
         updateMappedTargets();
-        targetVectorX  = compound.contains("TargetVectorX")  ? compound.getFloat("TargetVectorX")  : targetVectorX;
-        targetVectorY  = compound.contains("TargetVectorY")  ? compound.getFloat("TargetVectorY")  : targetVectorY;
-        currentVectorX = compound.contains("CurrentVectorX") ? compound.getFloat("CurrentVectorX") : targetVectorX;
-        currentVectorY = compound.contains("CurrentVectorY") ? compound.getFloat("CurrentVectorY") : targetVectorY;
-        prevVectorX = currentVectorX;
-        prevVectorY = currentVectorY;
+        targetVectorX = compound.contains("TargetVectorX") ? compound.getFloat("TargetVectorX") : targetVectorX;
+        targetVectorY = compound.contains("TargetVectorY") ? compound.getFloat("TargetVectorY") : targetVectorY;
+        if (!clientPacket || !clientInitialized) {
+            currentVectorX = compound.contains("CurrentVectorX") ? compound.getFloat("CurrentVectorX") : targetVectorX;
+            currentVectorY = compound.contains("CurrentVectorY") ? compound.getFloat("CurrentVectorY") : targetVectorY;
+            prevVectorX = currentVectorX;
+            prevVectorY = currentVectorY;
+            if (clientPacket) clientInitialized = true;
+        }
         obstructionEfficiency = compound.contains("ObstructionEfficiency")
             ? compound.getFloat("ObstructionEfficiency")
             : (OBSTRUCTION_LENGTH <= 0 ? 0.0f : Math.clamp((float) emptyBlocks / (float) OBSTRUCTION_LENGTH, 0.0f, 1.0f));
