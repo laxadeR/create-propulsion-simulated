@@ -48,7 +48,7 @@ public class ThrusterScenes {
             .placeNearTarget();
         scene.idle(90);
 
-        scene.overlay().showControls(util.vector().centerOf(util.grid().at(0, 1, 2)), Pointing.RIGHT, 50)
+        scene.overlay().showControls(util.vector().centerOf(util.grid().at(0, 1, 2)), Pointing.RIGHT, 70)
             .rightClick()
             .withItem(new ItemStack(Items.WATER_BUCKET));
         scene.overlay().showText(70)
@@ -58,7 +58,7 @@ public class ThrusterScenes {
             .placeNearTarget();
         scene.idle(80);
 
-        scene.overlay().showControls(util.vector().centerOf(util.grid().at(0, 1, 2)), Pointing.RIGHT, 50)
+        scene.overlay().showControls(util.vector().centerOf(util.grid().at(0, 1, 2)), Pointing.RIGHT, 80)
             .rightClick()
             .withItem(new ItemStack(Items.LAVA_BUCKET));
         scene.overlay().showText(80)
@@ -66,7 +66,7 @@ public class ThrusterScenes {
             .sharedText("thruster_normal.valid_fuels")
             .pointAt(util.vector().centerOf(util.grid().at(1, 1, 2)))
             .placeNearTarget();
-        scene.idle(70);
+        scene.idle(90);
 
         scene.world().modifyBlockEntityNBT(thruster, ThrusterBlockEntity.class, nbt -> {
             CompoundTag lava = new CompoundTag();
