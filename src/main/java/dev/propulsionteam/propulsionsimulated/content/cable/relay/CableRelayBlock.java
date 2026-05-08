@@ -19,6 +19,11 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
+
 public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>, IWrenchable {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -35,28 +40,60 @@ public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
         if (level.isClientSide) return;
-        boolean powered = isPoweredByNeighbors(level, pos);
-        if (powered != state.getValue(POWERED)) {
-            level.setBlock(pos, state.setValue(POWERED, powered), Block.UPDATE_ALL);
-        }
+        updateCluster(level, pos);
     }
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (level.isClientSide) return;
-        boolean powered = isPoweredByNeighbors(level, pos);
-        if (powered != state.getValue(POWERED)) {
-            level.setBlock(pos, state.setValue(POWERED, powered), Block.UPDATE_ALL);
-        }
+        updateCluster(level, pos);
     }
 
-    private static boolean isPoweredByNeighbors(Level level, BlockPos pos) {
-        for (Direction dir : Direction.values()) {
-            if (level.getSignal(pos.relative(dir), dir) > 0) {
-                return true;
+    /**
+     * BFS across all connected relay blocks to determine shared power state.
+     * A relay cluster is powered if ANY relay in it has an external (non-relay) neighbour
+     * providing a signal. This prevents feedback loops when relays are chained.
+     */
+    private static void updateCluster(Level level, BlockPos start) {
+        // 1. Collect the whole connected relay cluster.
+        Set<BlockPos> cluster = new HashSet<>();
+        Deque<BlockPos> queue = new ArrayDeque<>();
+        queue.add(start);
+        while (!queue.isEmpty()) {
+            BlockPos current = queue.poll();
+            if (!cluster.add(current)) continue;
+            for (Direction dir : Direction.values()) {
+                BlockPos neighbor = current.relative(dir);
+                if (level.getBlockState(neighbor).getBlock() instanceof CableRelayBlock
+                        && !cluster.contains(neighbor)) {
+                    queue.add(neighbor);
+                }
             }
         }
-        return false;
+
+        // 2. Check if any relay in the cluster has an external signal.
+        boolean powered = false;
+        outer:
+        for (BlockPos relayPos : cluster) {
+            for (Direction dir : Direction.values()) {
+                BlockPos neighborPos = relayPos.relative(dir);
+                // Skip other relays — they are part of the cluster, not an external source.
+                if (level.getBlockState(neighborPos).getBlock() instanceof CableRelayBlock) continue;
+                if (level.getSignal(neighborPos, dir) > 0) {
+                    powered = true;
+                    break outer;
+                }
+            }
+        }
+
+        // 3. Apply the shared state to every relay in the cluster.
+        for (BlockPos relayPos : cluster) {
+            BlockState relayState = level.getBlockState(relayPos);
+            if (relayState.getBlock() instanceof CableRelayBlock
+                    && relayState.getValue(POWERED) != powered) {
+                level.setBlock(relayPos, relayState.setValue(POWERED, powered), Block.UPDATE_ALL);
+            }
+        }
     }
 
     @Override

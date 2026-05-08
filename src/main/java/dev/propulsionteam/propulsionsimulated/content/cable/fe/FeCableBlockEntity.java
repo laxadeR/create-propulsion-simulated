@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.propulsionteam.propulsionsimulated.PropulsionConfig;
 import dev.propulsionteam.propulsionsimulated.content.cable.hub.CableHubBlockEntity;
+import dev.propulsionteam.propulsionsimulated.content.cable.relay.CableRelayBlockEntity;
 import dev.propulsionteam.propulsionsimulated.registries.PropulsionBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -80,8 +81,11 @@ public class FeCableBlockEntity extends SmartBlockEntity {
 
         for (BlockPos cablePos : network) {
             BlockState state = level.getBlockState(cablePos);
+            boolean nodeIsCable = state.getBlock() instanceof FeCableBlock;
             for (Direction direction : Direction.values()) {
-                if (!FeCableBlock.isSideEnabled(state, direction) || !FeCableBlock.isSideConnected(state, direction)) {
+                // Only cables have per-side enable/connect state; relays are open on all sides.
+                if (nodeIsCable && (!FeCableBlock.isSideEnabled(state, direction)
+                        || !FeCableBlock.isSideConnected(state, direction))) {
                     continue;
                 }
 
@@ -203,25 +207,34 @@ public class FeCableBlockEntity extends SmartBlockEntity {
             }
 
             BlockState state = level.getBlockState(current);
-            if (!(state.getBlock() instanceof FeCableBlock)) {
+            boolean currentIsCable = state.getBlock() instanceof FeCableBlock;
+            boolean currentIsRelay = level.getBlockEntity(current) instanceof CableRelayBlockEntity;
+            if (!currentIsCable && !currentIsRelay) {
                 continue;
             }
 
             for (Direction direction : Direction.values()) {
-                if (!FeCableBlock.isSideEnabled(state, direction) || !FeCableBlock.isSideConnected(state, direction)) {
+                // Cables respect per-side enabled/connected state; relays are open on all sides.
+                if (currentIsCable && (!FeCableBlock.isSideEnabled(state, direction)
+                        || !FeCableBlock.isSideConnected(state, direction))) {
                     continue;
                 }
 
                 BlockPos neighbor = current.relative(direction);
                 var be = level.getBlockEntity(neighbor);
-                if (!(be instanceof FeCableBlockEntity)) {
+                boolean neighborIsCable = be instanceof FeCableBlockEntity;
+                boolean neighborIsRelay = be instanceof CableRelayBlockEntity;
+                if (!neighborIsCable && !neighborIsRelay) {
                     continue;
                 }
 
-                BlockState neighborState = level.getBlockState(neighbor);
-                if (!FeCableBlock.isSideEnabled(neighborState, direction.getOpposite())
-                    || !FeCableBlock.isSideConnected(neighborState, direction.getOpposite())) {
-                    continue;
+                // Cables also require the neighbour's back-face to be enabled/connected.
+                if (neighborIsCable) {
+                    BlockState neighborState = level.getBlockState(neighbor);
+                    if (!FeCableBlock.isSideEnabled(neighborState, direction.getOpposite())
+                            || !FeCableBlock.isSideConnected(neighborState, direction.getOpposite())) {
+                        continue;
+                    }
                 }
 
                 if (!visited.contains(neighbor)) {
@@ -235,7 +248,7 @@ public class FeCableBlockEntity extends SmartBlockEntity {
 
     private boolean isTransitNode(BlockPos pos) {
         var be = level != null ? level.getBlockEntity(pos) : null;
-        return be instanceof FeCableBlockEntity || be instanceof CableHubBlockEntity;
+        return be instanceof FeCableBlockEntity || be instanceof CableHubBlockEntity || be instanceof CableRelayBlockEntity;
     }
 
     @Override

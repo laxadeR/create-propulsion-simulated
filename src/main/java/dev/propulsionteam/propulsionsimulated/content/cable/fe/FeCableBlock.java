@@ -3,6 +3,7 @@ package dev.propulsionteam.propulsionsimulated.content.cable.fe;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import dev.propulsionteam.propulsionsimulated.content.cable.relay.CableRelayBlockEntity;
 import dev.propulsionteam.propulsionsimulated.registries.PropulsionBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -162,6 +163,9 @@ public class FeCableBlock extends Block implements IBE<FeCableBlockEntity>, IWre
             return !neighborState.getValue(disabledPropertyFor(sideOnNeighbor));
         }
         if (be instanceof dev.propulsionteam.propulsionsimulated.content.cable.hub.CableHubBlockEntity) {
+            return true;
+        }
+        if (be instanceof CableRelayBlockEntity) {
             return true;
         }
         if (!(level instanceof Level realLevel)) {
