@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.util.RandomSource;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -26,6 +28,7 @@ import java.util.Set;
 
 public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>, IWrenchable {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    private static boolean clusterUpdateInProgress = false;
 
     public CableRelayBlock(Properties properties) {
         super(properties);
@@ -39,60 +42,74 @@ public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>
 
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-        if (level.isClientSide) return;
-        updateCluster(level, pos);
+        if (level.isClientSide || clusterUpdateInProgress) return;
+        level.scheduleTick(pos, this, 1);
     }
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (level.isClientSide) return;
+        level.scheduleTick(pos, this, 1);
+    }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         updateCluster(level, pos);
     }
 
-    /**
-     * BFS across all connected relay blocks to determine shared power state.
-     * A relay cluster is powered if ANY relay in it has an external (non-relay) neighbour
-     * providing a signal. This prevents feedback loops when relays are chained.
-     */
     private static void updateCluster(Level level, BlockPos start) {
-        // 1. Collect the whole connected relay cluster.
+        if (clusterUpdateInProgress) return;
+        clusterUpdateInProgress = true;
+        try {
         Set<BlockPos> cluster = new HashSet<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
         queue.add(start);
+
         while (!queue.isEmpty()) {
             BlockPos current = queue.poll();
             if (!cluster.add(current)) continue;
             for (Direction dir : Direction.values()) {
                 BlockPos neighbor = current.relative(dir);
-                if (level.getBlockState(neighbor).getBlock() instanceof CableRelayBlock
-                        && !cluster.contains(neighbor)) {
+                if (level.getBlockState(neighbor).getBlock() instanceof CableRelayBlock && !cluster.contains(neighbor)) {
                     queue.add(neighbor);
                 }
             }
         }
 
-        // 2. Check if any relay in the cluster has an external signal.
+        // Clear cluster output first so externally-powered components can be evaluated
+        // without feedback from this same relay cluster.
+        for (BlockPos relayPos : cluster) {
+            BlockState relayState = level.getBlockState(relayPos);
+            if (relayState.getBlock() instanceof CableRelayBlock && relayState.getValue(POWERED)) {
+                level.setBlock(relayPos, relayState.setValue(POWERED, false), Block.UPDATE_ALL);
+            }
+        }
+
         boolean powered = false;
         outer:
         for (BlockPos relayPos : cluster) {
             for (Direction dir : Direction.values()) {
                 BlockPos neighborPos = relayPos.relative(dir);
-                // Skip other relays — they are part of the cluster, not an external source.
                 if (level.getBlockState(neighborPos).getBlock() instanceof CableRelayBlock) continue;
-                if (level.getSignal(neighborPos, dir) > 0) {
+
+                Direction towardRelay = dir.getOpposite();
+                int weak = level.getSignal(neighborPos, towardRelay);
+                int strong = level.getDirectSignal(neighborPos, towardRelay);
+                if (weak > 0 || strong > 0) {
                     powered = true;
                     break outer;
                 }
             }
         }
 
-        // 3. Apply the shared state to every relay in the cluster.
         for (BlockPos relayPos : cluster) {
             BlockState relayState = level.getBlockState(relayPos);
-            if (relayState.getBlock() instanceof CableRelayBlock
-                    && relayState.getValue(POWERED) != powered) {
+            if (relayState.getBlock() instanceof CableRelayBlock && relayState.getValue(POWERED) != powered) {
                 level.setBlock(relayPos, relayState.setValue(POWERED, powered), Block.UPDATE_ALL);
             }
+        }
+        } finally {
+            clusterUpdateInProgress = false;
         }
     }
 
@@ -103,6 +120,11 @@ public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>
 
     @Override
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return state.getValue(POWERED) ? 15 : 0;
+    }
+
+    @Override
+    public int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return state.getValue(POWERED) ? 15 : 0;
     }
 

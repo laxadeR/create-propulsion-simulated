@@ -4,6 +4,7 @@ import dev.propulsionteam.propulsionsimulated.registries.PropulsionDefaultStress
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +75,6 @@ public class PropulsionConfig {
     public static final ModConfigSpec.ConfigValue<Boolean> BURNERS_HEAT_STEAM_ENGINES;
     public static final ModConfigSpec.ConfigValue<Boolean> BURNERS_SUPERHEAT_STEAM_ENGINES;
     public static final ModConfigSpec.ConfigValue<Boolean> BLAZE_BURNERS_HEAT_STIRLING_ENGINES;
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> FUEL_EFFICIENCY_RATES;
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> FUEL_BURN_RATE_RATES;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> CORAL_FUEL_CONVERSION_RATES;
 
     static {
@@ -214,16 +213,6 @@ public class PropulsionConfig {
                     "Example: createpropulsion:turpentine=80,120")
                 .defineListAllowEmpty("fuelProperties", PropulsionConfig::defaultFuelProperties, () -> "",
                     value -> value instanceof String);
-            FUEL_EFFICIENCY_RATES = SERVER_BUILDER.comment(
-                    "Fuel efficiency entries as '<namespace:fluid>=<efficiency_percent>'.",
-                    "Example: createdieselgenerators:gasoline=125")
-                .defineListAllowEmpty("fuelEfficiencyRates", PropulsionConfig::defaultFuelEfficiencyRates, () -> "",
-                    value -> value instanceof String);
-            FUEL_BURN_RATE_RATES = SERVER_BUILDER.comment(
-                    "Fuel burn rate entries as '<namespace:fluid>=<burn_rate_percent>'.",
-                    "Example: createdieselgenerators:gasoline=80")
-                .defineListAllowEmpty("fuelBurnRateRates", PropulsionConfig::defaultFuelBurnRateRates, () -> "",
-                    value -> value instanceof String);
             CORAL_FUEL_CONVERSION_RATES = SERVER_BUILDER.comment(
                     "Coral conversion entries as '<namespace:fluid>=<fe_per_mb>'.",
                     "Example: createpropulsion:coral=16")
@@ -286,8 +275,8 @@ public class PropulsionConfig {
     }
 
     private static List<String> defaultFuelProperties() {
-        return List.of(
-                "createpropulsion:turpentine=80,120",
+        return new ArrayList<>(List.of(
+                "createpropulsion:turpentine=100,150",
                 "minecraft:lava=75,100",
                 "createdieselgenerators:plant_oil=55,170",
                 "immersiveengineering:plantoil=55,170",
@@ -314,76 +303,13 @@ public class PropulsionConfig {
                 "northstar:methane=105,95",
                 "northstar:liquid_hydrogen=125,80",
                 "immersivepetroleum:diesel_sulfur=100,100"
-        );
+        ));
     }
 
     private static List<String> defaultCoralFuelConversionRates() {
-        return List.of("createpropulsion:coral=16");
+        return new ArrayList<>(List.of("createpropulsion:coral=16"));
     }
 
-    private static List<String> defaultFuelEfficiencyRates() {
-        return List.of(
-                "createpropulsion:turpentine=80",
-                "minecraft:lava=75",
-                "createdieselgenerators:plant_oil=55",
-                "immersiveengineering:plantoil=55",
-                "createdieselgenerators:ethanol=70",
-                "immersiveengineering:ethanol=70",
-                "mekanismgenerators:bioethanol=75",
-                "northstar:biofuel=80",
-                "createdieselgenerators:biodiesel=90",
-                "immersiveengineering:biodiesel=90",
-                "immersiveengineering:high_power_biodiesel=105",
-                "createdieselgenerators:diesel=100",
-                "tfmg:diesel=100",
-                "stellaris:diesel=100",
-                "tfmg:naphtha=95",
-                "tfmg:kerosene=115",
-                "createdieselgenerators:gasoline=125",
-                "tfmg:gasoline=125",
-                "tfmg:lpg=120",
-                "northstar:hydrocarbon=130",
-                "stellaris:fuel=115",
-                "mekanism:hydrogen=120",
-                "createaddition:bioethanol=75",
-                "createaddition:seed_oil=55",
-                "northstar:methane=105",
-                "northstar:liquid_hydrogen=125",
-                "immersivepetroleum:diesel_sulfur=100"
-        );
-    }
-
-    private static List<String> defaultFuelBurnRateRates() {
-        return List.of(
-                "createpropulsion:turpentine=120",
-                "minecraft:lava=100",
-                "createdieselgenerators:plant_oil=170",
-                "immersiveengineering:plantoil=170",
-                "createdieselgenerators:ethanol=140",
-                "immersiveengineering:ethanol=140",
-                "mekanismgenerators:bioethanol=135",
-                "northstar:biofuel=125",
-                "createdieselgenerators:biodiesel=110",
-                "immersiveengineering:biodiesel=110",
-                "immersiveengineering:high_power_biodiesel=95",
-                "createdieselgenerators:diesel=100",
-                "tfmg:diesel=100",
-                "stellaris:diesel=100",
-                "tfmg:naphtha=105",
-                "tfmg:kerosene=90",
-                "createdieselgenerators:gasoline=80",
-                "tfmg:gasoline=80",
-                "tfmg:lpg=85",
-                "northstar:hydrocarbon=75",
-                "stellaris:fuel=100",
-                "mekanism:hydrogen=80",
-                "createaddition:bioethanol=135",
-                "createaddition:seed_oil=170",
-                "northstar:methane=95",
-                "northstar:liquid_hydrogen=80",
-                "immersivepetroleum:diesel_sulfur=100"
-        );
-    }
 
     public static Integer getDyeColor(String dyeId) {
         ModConfigSpec.ConfigValue<String> cv = THRUSTER_DYE_COLORS.get(dyeId);
@@ -407,19 +333,12 @@ public class PropulsionConfig {
         }
     }
 
-    public static List<? extends String> getFuelBurnRateRatesOrDefault() {
+    public static List<? extends String> getFuelPropertiesOrDefault() {
         try {
-            return FUEL_BURN_RATE_RATES.get();
+            return FUEL_PROPERTIES.get();
         } catch (IllegalStateException ignored) {
-            return defaultFuelBurnRateRates();
+            return defaultFuelProperties();
         }
     }
 
-    public static List<? extends String> getFuelEfficiencyRatesOrDefault() {
-        try {
-            return FUEL_EFFICIENCY_RATES.get();
-        } catch (IllegalStateException ignored) {
-            return defaultFuelEfficiencyRates();
-        }
-    }
 }

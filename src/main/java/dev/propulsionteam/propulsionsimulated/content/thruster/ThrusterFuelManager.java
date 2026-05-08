@@ -245,79 +245,69 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
 
     private static Map<ResourceLocation, Float> getConfiguredEfficiencyOverrides() {
         Map<ResourceLocation, Float> overrides = new HashMap<>();
-        for (String rawEntry : PropulsionConfig.getFuelEfficiencyRatesOrDefault()) {
+        // Base table: unified fuel properties list ("<fluid>=<efficiency>,<burnRate>").
+        for (String rawEntry : PropulsionConfig.getFuelPropertiesOrDefault()) {
             if (rawEntry == null) {
                 continue;
             }
             String entry = rawEntry.trim();
             int separator = entry.indexOf('=');
             if (separator <= 0 || separator == entry.length() - 1) {
-                LOGGER.warn("[{}] Ignoring malformed fuel efficiency entry '{}'. Expected '<namespace:fluid>=<percent>'.", CreatePropulsion.ID, rawEntry);
                 continue;
             }
-
             String fluidId = entry.substring(0, separator).trim();
-            String percentText = entry.substring(separator + 1).trim();
+            String valuePart = entry.substring(separator + 1).trim();
+            String[] values = valuePart.split(",");
+            if (values.length < 1) {
+                continue;
+            }
             ResourceLocation rl = ResourceLocation.tryParse(fluidId);
             if (rl == null) {
-                LOGGER.warn("[{}] Ignoring fuel efficiency entry with invalid fluid id '{}'.", CreatePropulsion.ID, rawEntry);
                 continue;
             }
-
-            float percent;
             try {
-                percent = Float.parseFloat(percentText);
-            } catch (NumberFormatException e) {
-                LOGGER.warn("[{}] Ignoring fuel efficiency entry with invalid percent '{}'.", CreatePropulsion.ID, rawEntry);
-                continue;
+                float percent = Float.parseFloat(values[0].trim());
+                if (percent >= 0.0f) {
+                    overrides.put(rl, percent / 100.0f);
+                }
+            } catch (NumberFormatException ignored) {
             }
-
-            if (percent < 0.0f) {
-                LOGGER.warn("[{}] Ignoring fuel efficiency entry with negative percent '{}'.", CreatePropulsion.ID, rawEntry);
-                continue;
-            }
-
-            overrides.put(rl, percent / 100.0f);
         }
+
         return overrides;
     }
 
     private static Map<ResourceLocation, Float> getConfiguredConsumptionOverrides() {
         Map<ResourceLocation, Float> overrides = new HashMap<>();
-        for (String rawEntry : PropulsionConfig.getFuelBurnRateRatesOrDefault()) {
+        // Base table: unified fuel properties list ("<fluid>=<efficiency>,<burnRate>").
+        for (String rawEntry : PropulsionConfig.getFuelPropertiesOrDefault()) {
             if (rawEntry == null) {
                 continue;
             }
             String entry = rawEntry.trim();
             int separator = entry.indexOf('=');
             if (separator <= 0 || separator == entry.length() - 1) {
-                LOGGER.warn("[{}] Ignoring malformed fuel consumption entry '{}'. Expected '<namespace:fluid>=<percent>'.", CreatePropulsion.ID, rawEntry);
                 continue;
             }
-
             String fluidId = entry.substring(0, separator).trim();
-            String percentText = entry.substring(separator + 1).trim();
+            String valuePart = entry.substring(separator + 1).trim();
+            String[] values = valuePart.split(",");
+            if (values.length < 2) {
+                continue;
+            }
             ResourceLocation rl = ResourceLocation.tryParse(fluidId);
             if (rl == null) {
-                LOGGER.warn("[{}] Ignoring fuel consumption entry with invalid fluid id '{}'.", CreatePropulsion.ID, rawEntry);
                 continue;
             }
-
-            float percent;
             try {
-                percent = Float.parseFloat(percentText);
-            } catch (NumberFormatException e) {
-                LOGGER.warn("[{}] Ignoring fuel consumption entry with invalid percent '{}'.", CreatePropulsion.ID, rawEntry);
-                continue;
+                float percent = Float.parseFloat(values[1].trim());
+                if (percent >= 0.0f) {
+                    overrides.put(rl, percent / 100.0f);
+                }
+            } catch (NumberFormatException ignored) {
             }
-
-            if (percent < 0.0f) {
-                LOGGER.warn("[{}] Ignoring fuel consumption entry with negative percent '{}'.", CreatePropulsion.ID, rawEntry);
-                continue;
-            }
-
-            overrides.put(rl, percent / 100.0f);
         }
+
         return overrides;
     }
 

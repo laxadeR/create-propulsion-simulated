@@ -57,8 +57,15 @@ public class FeCableBlockEntity extends SmartBlockEntity {
         if (level == null || level.isClientSide) {
             return;
         }
+        tickNetworkAt(worldPosition);
+    }
 
-        Set<BlockPos> network = collectNetwork(worldPosition);
+    public void tickNetworkAt(BlockPos startPos) {
+        if (level == null || level.isClientSide) {
+            return;
+        }
+
+        Set<BlockPos> network = collectNetwork(startPos);
         if (network.isEmpty()) {
             return;
         }
@@ -66,7 +73,7 @@ public class FeCableBlockEntity extends SmartBlockEntity {
         BlockPos controller = network.stream().min(Comparator
             .comparingInt((BlockPos p) -> p.getY())
             .thenComparingInt(p -> p.getX())
-            .thenComparingInt(p -> p.getZ())).orElse(worldPosition);
+            .thenComparingInt(p -> p.getZ())).orElse(startPos);
 
         if (!worldPosition.equals(controller)) {
             return;
