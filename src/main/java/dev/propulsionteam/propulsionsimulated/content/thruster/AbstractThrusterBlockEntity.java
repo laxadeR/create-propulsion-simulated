@@ -616,12 +616,12 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
-        CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status")).text(":").space().add(getGoggleStatus()).forGoggles(tooltip);
+        tooltip.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status")).text(":").space().add(getGoggleStatus()).component());
 
         addThrusterDetails(tooltip, isPlayerSneaking);
 
         if (controlMode == ControlMode.PERIPHERAL) {
-            CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.cc.peripheral_controlled")).style(ChatFormatting.GRAY).forGoggles(tooltip);
+            tooltip.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.cc.peripheral_controlled")).style(ChatFormatting.GRAY).component());
         }
 
         return true;
@@ -634,25 +634,25 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity
         if (emptyBlocks < scanLength) {
             obstructionEfficiency = calculateObstructionEffect() * 100;
             tooltipColor = GoggleUtils.efficiencyColor(obstructionEfficiency);
-            CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.obstructed")).space().add(CreateLang.text(GoggleUtils.makeObstructionBar(emptyBlocks, scanLength))).style(tooltipColor).forGoggles(tooltip);
+            tooltip.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.obstructed")).space().add(CreateLang.text(GoggleUtils.makeObstructionBar(emptyBlocks, scanLength))).style(tooltipColor).component());
         }
 
         // Show efficiency based only on block obstruction (100 = no obstruction)
-        CreateLang.builder()
+        tooltip.add(CreateLang.builder()
             .add(Component.translatable("createpropulsion.gui.goggles.thruster.efficiency")).text(": ").add(CreateLang.number(obstructionEfficiency)).add(CreateLang.text("%"))
-            .style(tooltipColor).forGoggles(tooltip);
+            .style(tooltipColor).component());
 
-        CreateLang.builder()
+        tooltip.add(CreateLang.builder()
                 .add(Component.translatable("createpropulsion.gui.goggles.thruster.thrust_output"))
                 .style(ChatFormatting.WHITE)
-                .forGoggles(tooltip);
+                .component());
 
-        CreateLang.builder()
-            .add(Component.literal(" "))
+        tooltip.add(CreateLang.builder()
+            .add(Component.literal("  "))
             .add(Component.translatable("createpropulsion.tooltip.thrust1"))
             .add(Component.literal(String.format(Locale.ROOT, "%.2f", this.getDisplayedThrustPnForTooltip() / PN_PER_DISPLAY_UNIT)).withStyle(ChatFormatting.AQUA))
             .add(Component.literal(" pN").withStyle(ChatFormatting.GRAY))
-            .forGoggles(tooltip);
+            .component());
     }
 
 

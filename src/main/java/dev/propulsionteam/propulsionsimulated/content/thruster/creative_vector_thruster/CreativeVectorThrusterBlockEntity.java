@@ -126,58 +126,7 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
         return new PlumeParticleData(List.of(), color);
     }
 
-    @Override
-    protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
-        float obstructionEfficiency = 100;
-        ChatFormatting tooltipColor = ChatFormatting.GREEN;
-        int scanLength = PropulsionConfig.OBSTRUCTION_SCAN_LENGTH.get();
-        if (emptyBlocks < scanLength) {
-            obstructionEfficiency = calculateObstructionEffect() * 100;
-            tooltipColor = GoggleUtils.efficiencyColor(obstructionEfficiency);
-            CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.obstructed")).space()
-                    .add(CreateLang.text(GoggleUtils.makeObstructionBar(emptyBlocks, scanLength))).style(tooltipColor).forGoggles(tooltip);
-        }
 
-        CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.thruster.efficiency")).text(": ")
-                .add(CreateLang.number(obstructionEfficiency)).add(CreateLang.text("%"))
-                .style(tooltipColor).forGoggles(tooltip);
-
-        CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.thruster.thrust_output"))
-                .style(ChatFormatting.WHITE)
-                .forGoggles(tooltip);
-
-        MutableComponent thrustValue = Component.literal(String.format(Locale.ROOT, "%.2f", this.getDisplayedThrustPnForTooltip() / 1000.0d))
-                .withStyle(ChatFormatting.AQUA);
-        CreateLang.builder()
-                .add(Component.literal(" "))
-                .add(Component.translatable("createpropulsion.tooltip.thrust1"))
-                .add(thrustValue)
-                .add(Component.literal(" pN").withStyle(ChatFormatting.GRAY))
-                .forGoggles(tooltip);
-
-        LangBuilder particleBuilder = CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle")).text(": ")
-                .style(ChatFormatting.WHITE);
-
-        switch (plumeType) {
-            case PLASMA -> particleBuilder.add(CreateLang.builder()
-                    .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plasma"))
-                    .style(ChatFormatting.AQUA));
-            case ION -> particleBuilder.add(CreateLang.builder()
-                    .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.ion"))
-                    .style(ChatFormatting.BLUE));
-            case PLUME -> particleBuilder.add(CreateLang.builder()
-                    .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plume"))
-                    .style(ChatFormatting.GOLD));
-            case NONE -> particleBuilder.add(CreateLang.builder()
-                    .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.none"))
-                    .style(ChatFormatting.DARK_GRAY));
-        }
-
-        particleBuilder.forGoggles(tooltip);
-    }
 
     @Override
     protected LangBuilder getGoggleStatus() {

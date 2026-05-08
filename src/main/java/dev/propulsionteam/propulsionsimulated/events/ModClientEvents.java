@@ -114,6 +114,33 @@ public class ModClientEvents {
                 return 0xFFFFFFFF;
             }
         }, PropulsionFluids.CORAL_TYPE);
+
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public ResourceLocation getStillTexture() {
+                return ResourceLocation.parse("minecraft:block/water_still");
+            }
+
+            @Override
+            public ResourceLocation getFlowingTexture() {
+                return ResourceLocation.parse("minecraft:block/water_flow");
+            }
+
+            @Override
+            public int getTintColor() {
+                return 0xFF88CCFF;
+            }
+
+            @Override
+            public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
+                return 0xFF88CCFF;
+            }
+
+            @Override
+            public int getTintColor(FluidStack stack) {
+                return 0xFF88CCFF;
+            }
+        }, PropulsionFluids.OXIDIZER_TYPE);
     }
 
     @SubscribeEvent
@@ -123,6 +150,8 @@ public class ModClientEvents {
             ItemBlockRenderTypes.setRenderLayer(PropulsionFluids.FLOWING_TURPENTINE.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(PropulsionFluids.CORAL.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(PropulsionFluids.FLOWING_CORAL.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(PropulsionFluids.OXIDIZER.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(PropulsionFluids.FLOWING_OXIDIZER.get(), RenderType.translucent());
         });
 
         PonderIndex.addPlugin(new DeltaPonderPlugin());

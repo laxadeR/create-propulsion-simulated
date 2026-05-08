@@ -26,6 +26,8 @@ public class PropulsionFluids {
             () -> new FluidType(FluidType.Properties.create().descriptionId(TURPENTINE_DESCRIPTION).density(500).viscosity(1000)));
     public static final DeferredHolder<FluidType, FluidType> CORAL_TYPE = FLUID_TYPES.register("coral_type",
             () -> new FluidType(FluidType.Properties.create().descriptionId(CORAL_DESCRIPTION).density(1000).viscosity(1200)));
+    public static final DeferredHolder<FluidType, FluidType> OXIDIZER_TYPE = FLUID_TYPES.register("oxidizer_type",
+            () -> new FluidType(FluidType.Properties.create().descriptionId("fluid." + CreatePropulsion.ID + ".oxidizer").density(700).viscosity(500)));
 
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> TURPENTINE = FLUIDS.register("turpentine",
             () -> new ProtectedFlowingFluid.Source(turpentineProperties()));
@@ -35,11 +37,17 @@ public class PropulsionFluids {
             () -> new ProtectedFlowingFluid.Source(coralProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CORAL = FLUIDS.register("flowing_coral",
             () -> new ProtectedFlowingFluid.Flowing(coralProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> OXIDIZER = FLUIDS.register("oxidizer",
+            () -> new ProtectedFlowingFluid.Source(oxidizerProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_OXIDIZER = FLUIDS.register("flowing_oxidizer",
+            () -> new ProtectedFlowingFluid.Flowing(oxidizerProperties()));
 
     public static final DeferredBlock<LiquidBlock> TURPENTINE_BLOCK = PropulsionBlocks.BLOCKS.register("turpentine",
             () -> new LiquidBlock((FlowingFluid) TURPENTINE.get(), BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
     public static final DeferredBlock<LiquidBlock> CORAL_BLOCK = PropulsionBlocks.BLOCKS.register("coral",
             () -> new LiquidBlock((FlowingFluid) CORAL.get(), BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
+    public static final DeferredBlock<LiquidBlock> OXIDIZER_BLOCK = PropulsionBlocks.BLOCKS.register("oxidizer",
+            () -> new LiquidBlock((FlowingFluid) OXIDIZER.get(), BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
 
     public static void register(IEventBus modBus) {
         FLUID_TYPES.register(modBus);
@@ -67,6 +75,18 @@ public class PropulsionFluids {
                 .block(CORAL_BLOCK)
                 .levelDecreasePerBlock(1)
                 .tickRate(7)
+                .slopeFindDistance(3)
+                .explosionResistance(100f);
+    }
+    private static BaseFlowingFluid.Properties oxidizerProperties() {
+        return new BaseFlowingFluid.Properties(
+                OXIDIZER_TYPE,
+                OXIDIZER,
+                FLOWING_OXIDIZER
+        ).bucket(PropulsionItems.OXIDIZER_BUCKET)
+                .block(OXIDIZER_BLOCK)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
                 .slopeFindDistance(3)
                 .explosionResistance(100f);
     }

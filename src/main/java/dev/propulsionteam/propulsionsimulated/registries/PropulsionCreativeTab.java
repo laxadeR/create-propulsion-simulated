@@ -71,6 +71,7 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionItems.PLATINUM_SHEET.get());
                 output.accept(PropulsionItems.RAW_PLATINUM.get());
                 output.accept(PropulsionItems.CORAL_BUCKET.get());
+                output.accept(PropulsionItems.OXIDIZER_BUCKET.get());
                 output.accept(PropulsionBlocks.FE_CABLE.get());
                 output.accept(PropulsionBlocks.CABLE_RELAY.get());
             }

@@ -37,6 +37,8 @@ public class PropulsionConfig {
     public static final ModConfigSpec.DoubleValue MULTIBLOCK_3X_THRUST_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue MULTIBLOCK_2X_FUEL_EFFICIENCY;
     public static final ModConfigSpec.DoubleValue MULTIBLOCK_3X_FUEL_EFFICIENCY;
+    public static final ModConfigSpec.DoubleValue MULTIBLOCK_2X_OXIDIZER_EFFICIENCY;
+    public static final ModConfigSpec.DoubleValue MULTIBLOCK_3X_OXIDIZER_EFFICIENCY;
     public static final ModConfigSpec.BooleanValue DAMAGE_ENTITIES;
     public static final ModConfigSpec.IntValue DAMAGE_TICK_INTERVAL;
     public static final ModConfigSpec.DoubleValue NOZZLE_OFFSET_FROM_CENTER;
@@ -110,7 +112,7 @@ public class PropulsionConfig {
         ION_THRUSTER_ENERGY_CAPACITY_FE = SERVER_BUILDER.comment("Ion thruster internal FE capacity.")
                 .defineInRange("ionThrusterEnergyCapacityFe", 4000, 1, 100000000);
         ION_THRUSTER_FE_PER_TICK_AT_FULL_THROTTLE = SERVER_BUILDER.comment("Ion thruster energy consumption in FE per tick at full redstone throttle.")
-                .defineInRange("ionThrusterFePerTickAtFullThrottle", 80.0d, 0.0001d, 1000000.0d);
+                .defineInRange("ionThrusterFePerTickAtFullThrottle", 40.0d, 0.0001d, 1000000.0d);
         ION_THRUSTER_BASE_THRUST = SERVER_BUILDER.comment("Ion thruster base thrust at redstone 15 and full obstruction efficiency.")
                 .defineInRange("ionThrusterBaseThrust", 1200.d, 1.d, 10000000.d);
         SERVER_BUILDER.pop();
@@ -144,6 +146,10 @@ public class PropulsionConfig {
                 .defineInRange("multiblock2xFuelEfficiency", 0.8d, 0.01d, 10.0d);
             MULTIBLOCK_3X_FUEL_EFFICIENCY = SERVER_BUILDER.comment("Fuel cost multiplier for a 3x3x3 multiblock thruster (e.g. 0.95 = 5% cheaper).")
                 .defineInRange("multiblock3xFuelEfficiency", 0.6d, 0.01d, 10.0d);
+            MULTIBLOCK_2X_OXIDIZER_EFFICIENCY = SERVER_BUILDER.comment("Oxidizer cost multiplier for a 2x2x2 multiblock thruster. 0.85 = 15% savings.")
+                .defineInRange("multiblock2xOxidizerEfficiency", 0.85d, 0.01d, 10.0d);
+            MULTIBLOCK_3X_OXIDIZER_EFFICIENCY = SERVER_BUILDER.comment("Oxidizer cost multiplier for a 3x3x3 multiblock thruster. 0.75 = 25% savings.")
+                .defineInRange("multiblock3xOxidizerEfficiency", 0.75d, 0.01d, 10.0d);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("creativeVectorThruster");
