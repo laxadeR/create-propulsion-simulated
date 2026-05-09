@@ -5,6 +5,7 @@ import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.peripheral.generic.methods.FluidMethods;
+import net.minecraft.util.Mth;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 
+import dev.propulsionteam.propulsionsimulated.content.thruster.AbstractThrusterBlockEntity.ControlMode;
 import dev.propulsionteam.propulsionsimulated.content.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
 
@@ -38,6 +40,12 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     }
 
     @LuaFunction(mainThread = true)
+    public final void setPowerNormalized(double power) {
+        int redstonePower = Mth.floor(Mth.clamp(power, 0.0d, 1.0d) * 15.0d + 1.0e-6d);
+        blockEntity.setRedstonePower(redstonePower);
+    }
+
+    @LuaFunction(mainThread = true)
     public final double getPower() {
         return blockEntity.getThrottle();
     }
@@ -48,8 +56,18 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     }
 
     @LuaFunction
+    public final double getCurrentThrustKN() {
+        return getCurrentThrustPN() / 1000.0d;
+    }
+
+    @LuaFunction
     public final double getDisplayedThrustPN() {
         return blockEntity.getDisplayedThrustPnForTooltip();
+    }
+
+    @LuaFunction
+    public final double getDisplayedThrustKN() {
+        return getDisplayedThrustPN() / 1000.0d;
     }
 
     @LuaFunction
@@ -108,11 +126,15 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     @Override
     public void attach(@NotNull IComputerAccess computer) {
         super.attach(computer);
+        blockEntity.setDigitalInput(Mth.clamp(blockEntity.getPower(), 0.0f, 1.0f));
+        blockEntity.setControlMode(ControlMode.PERIPHERAL);
     }
 
     @Override
     public void detach(@NotNull IComputerAccess computer) {
         super.detach(computer);
+        blockEntity.setDigitalInput(0.0f);
         blockEntity.setRedstonePower(0);
+        blockEntity.setControlMode(ControlMode.NORMAL);
     }
 }
