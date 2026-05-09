@@ -83,9 +83,13 @@ public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>
             if (relayState.getBlock() instanceof CableRelayBlock && relayState.getValue(POWERED)) {
                 level.setBlock(relayPos, relayState.setValue(POWERED, false), Block.UPDATE_ALL);
             }
+            BlockEntity be = level.getBlockEntity(relayPos);
+            if (be instanceof CableRelayBlockEntity relayBe) {
+                relayBe.setRedstoneSignalStrength(0);
+            }
         }
 
-        boolean powered = false;
+        int maxSignal = 0;
         outer:
         for (BlockPos relayPos : cluster) {
             for (Direction dir : Direction.values()) {
@@ -95,17 +99,25 @@ public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>
                 Direction towardRelay = dir.getOpposite();
                 int weak = level.getSignal(neighborPos, towardRelay);
                 int strong = level.getDirectSignal(neighborPos, towardRelay);
-                if (weak > 0 || strong > 0) {
-                    powered = true;
+                int signal = Math.max(weak, strong);
+                if (signal > maxSignal) {
+                    maxSignal = signal;
+                }
+                if (maxSignal >= 15) {
                     break outer;
                 }
             }
         }
+        boolean powered = maxSignal > 0;
 
         for (BlockPos relayPos : cluster) {
             BlockState relayState = level.getBlockState(relayPos);
             if (relayState.getBlock() instanceof CableRelayBlock && relayState.getValue(POWERED) != powered) {
                 level.setBlock(relayPos, relayState.setValue(POWERED, powered), Block.UPDATE_ALL);
+            }
+            BlockEntity be = level.getBlockEntity(relayPos);
+            if (be instanceof CableRelayBlockEntity relayBe) {
+                relayBe.setRedstoneSignalStrength(maxSignal);
             }
         }
         } finally {
@@ -120,11 +132,19 @@ public class CableRelayBlock extends Block implements IBE<CableRelayBlockEntity>
 
     @Override
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof CableRelayBlockEntity relayBe) {
+            return relayBe.getRedstoneSignalStrength();
+        }
         return state.getValue(POWERED) ? 15 : 0;
     }
 
     @Override
     public int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof CableRelayBlockEntity relayBe) {
+            return relayBe.getRedstoneSignalStrength();
+        }
         return state.getValue(POWERED) ? 15 : 0;
     }
 

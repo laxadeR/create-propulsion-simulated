@@ -21,12 +21,22 @@ import java.util.List;
 import java.util.Set;
 
 public class CableRelayBlockEntity extends SmartBlockEntity {
+    private int redstoneSignalStrength;
+
     public CableRelayBlockEntity(BlockPos pos, BlockState blockState) {
         super(PropulsionBlockEntities.CABLE_RELAY_BLOCK_ENTITY.get(), pos, blockState);
     }
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+
+    public int getRedstoneSignalStrength() {
+        return redstoneSignalStrength;
+    }
+
+    public void setRedstoneSignalStrength(int signalStrength) {
+        redstoneSignalStrength = Math.max(0, Math.min(15, signalStrength));
+    }
 
     @Override
     public void tick() {
