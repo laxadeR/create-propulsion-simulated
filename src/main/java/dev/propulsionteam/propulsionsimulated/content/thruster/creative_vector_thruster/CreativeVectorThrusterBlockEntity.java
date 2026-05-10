@@ -23,7 +23,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
 import java.util.Locale;
@@ -184,6 +183,61 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
     @Override
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection) {
         this.emptyBlocks = PropulsionConfig.OBSTRUCTION_SCAN_LENGTH.get();
+    }
+
+    @Override
+    protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
+        float obstructionEfficiency = 100;
+        ChatFormatting tooltipColor = ChatFormatting.GREEN;
+        int scanLength = PropulsionConfig.OBSTRUCTION_SCAN_LENGTH.get();
+        if (emptyBlocks < scanLength) {
+            obstructionEfficiency = calculateObstructionEffect() * 100;
+            tooltipColor = GoggleUtils.efficiencyColor(obstructionEfficiency);
+            CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.obstructed")).space()
+                    .add(CreateLang.text(GoggleUtils.makeObstructionBar(emptyBlocks, scanLength))).style(tooltipColor).forGoggles(tooltip);
+        }
+
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.thruster.efficiency")).text(": ")
+                .add(CreateLang.number(obstructionEfficiency)).add(CreateLang.text("%"))
+                .style(tooltipColor).forGoggles(tooltip);
+
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.thruster.thrust_output"))
+                .style(ChatFormatting.WHITE)
+                .forGoggles(tooltip);
+
+        CreateLang.builder()
+                .add(Component.literal("  "))
+                .add(Component.translatable("createpropulsion.tooltip.thrust1").withStyle(ChatFormatting.GRAY))
+                .add(Component.literal(String.format(Locale.ROOT, "%.2f", this.getDisplayedThrustPnForTooltip() / PN_PER_DISPLAY_UNIT)).withStyle(ChatFormatting.AQUA))
+                .add(Component.literal(" pN").withStyle(ChatFormatting.GRAY))
+                .forGoggles(tooltip);
+
+        addParticleCategory(tooltip);
+    }
+
+    private void addParticleCategory(List<Component> tooltip) {
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle"))
+                .style(ChatFormatting.WHITE)
+                .forGoggles(tooltip);
+
+        Component particleValue = switch (plumeType) {
+            case PLASMA -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plasma")
+                    .withStyle(ChatFormatting.AQUA);
+            case ION -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.ion")
+                    .withStyle(ChatFormatting.BLUE);
+            case PLUME -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plume")
+                    .withStyle(ChatFormatting.GOLD);
+            case NONE -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.none")
+                    .withStyle(ChatFormatting.DARK_GRAY);
+        };
+
+        CreateLang.builder()
+                .add(Component.literal("  "))
+                .add(particleValue)
+                .forGoggles(tooltip);
     }
 
     @Override

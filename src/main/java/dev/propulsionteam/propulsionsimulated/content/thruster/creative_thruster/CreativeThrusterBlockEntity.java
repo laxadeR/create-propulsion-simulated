@@ -152,24 +152,30 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addThrusterDetails(tooltip, isPlayerSneaking);
+        addParticleCategory(tooltip);
+    }
 
-        // Particle line
-        net.minecraft.network.chat.MutableComponent particleLine = Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle")
-                .append(Component.literal(": "))
-                .withStyle(ChatFormatting.WHITE);
+    private void addParticleCategory(List<Component> tooltip) {
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle"))
+                .style(ChatFormatting.WHITE)
+                .forGoggles(tooltip);
 
-        switch (plumeType) {
-            case PLASMA -> particleLine.append(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plasma")
-                    .withStyle(ChatFormatting.AQUA));
-            case ION -> particleLine.append(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.ion")
-                    .withStyle(ChatFormatting.BLUE));
-            case PLUME -> particleLine.append(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plume")
-                    .withStyle(ChatFormatting.GOLD));
-            case NONE -> particleLine.append(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.none")
-                    .withStyle(ChatFormatting.DARK_GRAY));
-        }
+        Component particleValue = switch (plumeType) {
+            case PLASMA -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plasma")
+                    .withStyle(ChatFormatting.AQUA);
+            case ION -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.ion")
+                    .withStyle(ChatFormatting.BLUE);
+            case PLUME -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plume")
+                    .withStyle(ChatFormatting.GOLD);
+            case NONE -> Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.none")
+                    .withStyle(ChatFormatting.DARK_GRAY);
+        };
 
-        tooltip.add(particleLine);
+        CreateLang.builder()
+                .add(Component.literal("  "))
+                .add(particleValue)
+                .forGoggles(tooltip);
     }
 
     @Override
