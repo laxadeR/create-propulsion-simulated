@@ -9,6 +9,7 @@ import dev.propulsionteam.propulsionsimulated.registries.PropulsionBlockEntities
 import dev.propulsionteam.propulsionsimulated.utility.FlickerAwareTicker;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity.SequenceContext;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencerInstructions;
@@ -97,8 +98,9 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
 
         BlockState state = getBlockState();
         Axis axis = state.getValue(RotatedPillarKineticBlock.AXIS);
-        boolean positiveDir = state.getValue(TiltAdapterBlock.POSITIVE);
-        boolean alignedX = state.getValue(TiltAdapterBlock.ALIGNED_X);
+        Direction facing = TiltAdapterBlock.getDirection(state);
+        boolean positiveDir = facing.getAxisDirection() == Direction.AxisDirection.POSITIVE;
+        boolean alignedX = TiltAdapterBlock.isAxisAlongFirst(state);
 
         Direction posSignalSide = (axis == Axis.X) ? Direction.SOUTH : (axis == Axis.Z ? Direction.WEST : (alignedX ? Direction.NORTH : Direction.EAST));
         Direction negSignalSide = (axis == Axis.X) ? Direction.NORTH : (axis == Axis.Z ? Direction.EAST : (alignedX ? Direction.SOUTH : Direction.WEST));
@@ -176,6 +178,9 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     }
 
     private Direction getBackFace(BlockState state) {
+        if (state.hasProperty(DirectionalKineticBlock.FACING)) {
+            return state.getValue(DirectionalKineticBlock.FACING).getOpposite();
+        }
         Axis axis = state.getValue(RotatedPillarKineticBlock.AXIS);
         boolean positive = state.hasProperty(TiltAdapterBlock.POSITIVE) ? state.getValue(TiltAdapterBlock.POSITIVE) : true;
         return Direction.get(positive ? Direction.AxisDirection.NEGATIVE : Direction.AxisDirection.POSITIVE, axis);

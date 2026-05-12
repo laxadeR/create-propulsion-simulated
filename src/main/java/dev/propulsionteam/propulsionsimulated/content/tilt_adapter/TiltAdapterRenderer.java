@@ -46,8 +46,8 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
         final BlockState blockState = blockEntity.getBlockState();
         final Direction direction = TiltAdapterBlock.getDirection(blockState);
         final Direction invDirection = direction.getOpposite();
-        final boolean alignedX = blockState.getValue(TiltAdapterBlock.ALIGNED_X);
-        final boolean positive = blockState.getValue(TiltAdapterBlock.POSITIVE);
+        final boolean alignedX = TiltAdapterBlock.isAxisAlongFirst(blockState);
+        final boolean positive = direction.getAxisDirection() == Direction.AxisDirection.POSITIVE;
 		float time = AnimationTickHolder.getRenderTime(level);
 
         SuperByteBuffer inputShaft = CachedBuffers.partialFacing(PropulsionPartialModels.TILT_ADAPTER_INPUT_SHAFT, blockState, invDirection);
