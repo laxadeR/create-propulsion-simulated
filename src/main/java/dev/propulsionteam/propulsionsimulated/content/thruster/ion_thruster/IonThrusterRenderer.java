@@ -71,11 +71,12 @@ public class IonThrusterRenderer extends SmartBlockEntityRenderer<IonThrusterBlo
             case UP -> {
             }
             case DOWN -> ms.mulPose(Axis.XP.rotationDegrees(180));
-            case NORTH -> ms.mulPose(Axis.XP.rotationDegrees(90));
-            case SOUTH -> {
+            // Keep Z-axis orientations aligned with logical IO (input=facing, exhaust=facing.opposite).
+            case NORTH -> {
                 ms.mulPose(Axis.YP.rotationDegrees(180));
                 ms.mulPose(Axis.XP.rotationDegrees(90));
             }
+            case SOUTH -> ms.mulPose(Axis.XP.rotationDegrees(90));
             case EAST -> {
                 ms.mulPose(Axis.YP.rotationDegrees(90));
                 ms.mulPose(Axis.XP.rotationDegrees(90));
