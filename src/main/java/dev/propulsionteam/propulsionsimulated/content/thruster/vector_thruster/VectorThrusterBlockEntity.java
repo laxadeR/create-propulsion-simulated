@@ -55,6 +55,11 @@ public class VectorThrusterBlockEntity extends IonThrusterBlockEntity {
         super(pos, state);
     }
 
+    @Override
+    protected boolean supportsMultiblock() {
+        return false;
+    }
+
     protected VectorThrusterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }

@@ -125,6 +125,7 @@
     "createpropulsion.gui.goggles.thruster.bulk_bonus_active": "(Active)",
     "createpropulsion.gui.goggles.thruster.bulk_bonus_inactive": "(Missing Oxidizer)",
     "createpropulsion.gui.goggles.thruster.status.no_oxidizer": "No Oxidizer",
+    "createpropulsion.gui.goggles.thruster.thrust_bonus": "Thrust Bonus",
     "createpropulsion.gui.goggles.thruster.energy_container": "Energy Storage",
     "createpropulsion.gui.goggles.title.thruster_stats": "Thruster Stats:",
     "createpropulsion.gui.goggles.title.generator_stats": "Generator Stats:",

@@ -152,15 +152,25 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     protected boolean isValidCube(BlockPos origin, int size, Direction facing) {
         if (level == null) return false;
+        BlockState originState = SimulatedThrustAdapter.getBlockStateSafe(level, origin);
+        Block expectedBlock = originState.getBlock();
+        Class<?> expectedType = null;
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 for (int z = 0; z < size; z++) {
                     BlockPos pos = origin.offset(x, y, z);
                     BlockState state = SimulatedThrustAdapter.getBlockStateSafe(level,pos);
+                    if (!state.is(expectedBlock)) return false;
                     if (!state.hasProperty(AbstractThrusterBlock.FACING)) return false;
                     if (state.getValue(AbstractThrusterBlock.FACING) != facing) return false;
                     BlockEntity be = SimulatedThrustAdapter.getBlockEntitySafe(level,pos);
                     if (!(be instanceof ThrusterBlockEntity t)) return false;
+                    if (expectedType == null) {
+                        expectedType = t.getClass();
+                    } else if (t.getClass() != expectedType) {
+                        // Prevent mixed thruster families (e.g. normal + ion) from assembling.
+                        return false;
+                    }
                     if (!t.supportsMultiblock()) return false;
                     if (t.isMultiblock() && t.width >= size) return false;
                 }
@@ -194,16 +204,20 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                     if (!(be instanceof ThrusterBlockEntity t)) return;
                     members.add(t);
                     if (pos.equals(origin)) controller = t;
-                    totalFuel = mergeFluid(totalFuel, t.tank.getPrimaryHandler().getFluid());
-                    t.tank.getPrimaryHandler().setFluid(FluidStack.EMPTY);
+                    if (t.tank != null) {
+                        totalFuel = mergeFluid(totalFuel, t.tank.getPrimaryHandler().getFluid());
+                        t.tank.getPrimaryHandler().setFluid(FluidStack.EMPTY);
+                    }
                 }
             }
         }
         if (controller == null) return;
 
         int newCap = getBaseTankCapacityMb() * size * size * size;
-        controller.tank.getPrimaryHandler().setCapacity(newCap);
-        controller.tank.getPrimaryHandler().setFluid(trimToCapacity(totalFuel, newCap));
+        if (controller.tank != null) {
+            controller.tank.getPrimaryHandler().setCapacity(newCap);
+            controller.tank.getPrimaryHandler().setFluid(trimToCapacity(totalFuel, newCap));
+        }
 
         for (ThrusterBlockEntity t : members) {
             t.controllerPos = (t == controller) ? null : origin;
@@ -211,8 +225,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             t.isThrustDirty = true;
             BlockPos cellPos = t.getBlockPos();
             BlockState liveState = SimulatedThrustAdapter.getBlockStateSafe(level,cellPos);
-            if (liveState.getBlock() instanceof ThrusterBlock
-                && liveState.hasProperty(ThrusterBlock.MULTIBLOCK)
+            if (liveState.hasProperty(ThrusterBlock.MULTIBLOCK)
                 && !liveState.getValue(ThrusterBlock.MULTIBLOCK)) {
                 level.setBlock(cellPos, liveState.setValue(ThrusterBlock.MULTIBLOCK, true), Block.UPDATE_CLIENTS);
             }
@@ -227,9 +240,12 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
         int size = width;
         BlockPos origin = worldPosition;
 
-        FluidStack fuelPool = tank.getPrimaryHandler().getFluid().copy();
-        tank.getPrimaryHandler().setFluid(FluidStack.EMPTY);
-        tank.getPrimaryHandler().setCapacity(getBaseTankCapacityMb());
+        FluidStack fuelPool = FluidStack.EMPTY;
+        if (tank != null) {
+            fuelPool = tank.getPrimaryHandler().getFluid().copy();
+            tank.getPrimaryHandler().setFluid(FluidStack.EMPTY);
+            tank.getPrimaryHandler().setCapacity(getBaseTankCapacityMb());
+        }
 
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
@@ -237,7 +253,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                     BlockPos pos = origin.offset(x, y, z);
                     BlockEntity be = SimulatedThrustAdapter.getBlockEntitySafe(level,pos);
                     if (!(be instanceof ThrusterBlockEntity t)) continue;
-                    if (!fuelPool.isEmpty()) {
+                    if (t.tank != null && !fuelPool.isEmpty()) {
                         int take = Math.min(getBaseTankCapacityMb(), fuelPool.getAmount());
                         FluidStack slice = new FluidStack(fuelPool.getFluid(), take);
                         t.tank.getPrimaryHandler().fill(slice, IFluidHandler.FluidAction.EXECUTE);
@@ -249,8 +265,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                     t.isThrustDirty = true;
                     t.thrusterData.setThrust(0);
                     BlockState liveState = SimulatedThrustAdapter.getBlockStateSafe(level,pos);
-                    if (liveState.getBlock() instanceof ThrusterBlock
-                        && liveState.hasProperty(ThrusterBlock.MULTIBLOCK)
+                    if (liveState.hasProperty(ThrusterBlock.MULTIBLOCK)
                         && liveState.getValue(ThrusterBlock.MULTIBLOCK)) {
                         level.setBlock(pos, liveState.setValue(ThrusterBlock.MULTIBLOCK, false), Block.UPDATE_CLIENTS);
                     }
@@ -392,7 +407,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                         ? (float) fuelConsumed / (float) consumption
                         : 1.0f;
                     float fuelEfficiency = ThrusterFuelManager.getEfficiency(fluidStack().getFluid());
-                    float baseThrustPn = (float) (getBaseThrust() * 1000.0);
+                    float baseThrustPn = (float) (getBaseThrust() * getThrustUnitsPerKn());
                     baseThrustPn *= (float) calculateAtmosphericFactor();
                     thrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * fuelEfficiency * consumptionRatio;
                     lastConsumedMbPerTick = (double) fuelConsumed / (double) tickRate;
@@ -456,7 +471,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                     }
 
                     float fuelEfficiency = ThrusterFuelManager.getEfficiency(fluidStack().getFluid());
-                    float baseThrustPn = (float) (getBaseThrust() * 1000.0);
+                    float baseThrustPn = (float) (getBaseThrust() * getThrustUnitsPerKn());
                     baseThrustPn *= (float) calculateAtmosphericFactor();
                     totalThrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * fuelEfficiency * fuelRatio * n * getMultiblockThrustMultiplier(width);
                     lastConsumedMbPerTick = (double) fuelActual / (double) tickRate;
@@ -581,7 +596,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             Vec3 centerNozzle = getMultiblockCenterNozzlePositionLocal();
             Vector3d applicationPoint = new Vector3d(centerNozzle.x, centerNozzle.y, centerNozzle.z);
             Vector3d impulseLocal = new Vector3d(directionLocal).mul(thrust * timeStep);
-            Vector3d adjustedImpulse = new Vector3d(impulseLocal).div(PN_PER_SABLE_FORCE_UNIT);
+            Vector3d adjustedImpulse = new Vector3d(impulseLocal).div(getThrustUnitsPerKn());
             SimulatedThrustAdapter.applyImpulseAtPoint(subLevel, applicationPoint, adjustedImpulse);
             return;
         }
@@ -784,15 +799,18 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     private boolean isValidFormedCube(BlockPos origin, int size, Direction facing) {
         if (level == null) return false;
+        Block expectedBlock = getBlockState().getBlock();
+        Class<?> expectedType = getClass();
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 for (int z = 0; z < size; z++) {
                     BlockPos pos = origin.offset(x, y, z);
                     BlockState state = SimulatedThrustAdapter.getBlockStateSafe(level,pos);
-                    if (!(state.getBlock() instanceof ThrusterBlock)) return false;
+                    if (!state.is(expectedBlock)) return false;
                     if (!state.hasProperty(AbstractThrusterBlock.FACING) || state.getValue(AbstractThrusterBlock.FACING) != facing) return false;
                     BlockEntity be = SimulatedThrustAdapter.getBlockEntitySafe(level,pos);
                     if (!(be instanceof ThrusterBlockEntity t)) return false;
+                    if (t.getClass() != expectedType) return false;
                     ThrusterBlockEntity ctrl = t.getControllerBE();
                     if (ctrl == null || ctrl != this) return false;
                     if (t.width != size) return false;

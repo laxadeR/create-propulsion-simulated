@@ -43,6 +43,8 @@ public class PropulsionPartialModels {
     //Multiblock thruster
     public static final PartialModel THRUSTER_MULTIBLOCK_2X2X2 = partial("thruster_multiblock_2x2x2");
     public static final PartialModel THRUSTER_MULTIBLOCK_3X3X3 = partial("thruster_multiblock_3x3x3");
+    public static final PartialModel ION_THRUSTER_MULTIBLOCK_2X2X2 = partial("2x2x2_ion_thruster");
+    public static final PartialModel ION_THRUSTER_MULTIBLOCK_3X3X3 = partial("3x3x3_ion_thruster");
     //Transmission
     public static final PartialModel TRANSMISSION_PLUS = partial("transmission_plus");
     public static final PartialModel TRANSMISSION_MINUS = partial("transmission_minus");

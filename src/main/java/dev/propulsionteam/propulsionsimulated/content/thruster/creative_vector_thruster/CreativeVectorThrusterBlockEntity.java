@@ -57,7 +57,7 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
         float thrust = 0;
         float currentPower = getPower();
         if (currentPower > 0) {
-            float baseThrustPn = peripheralThrustOutput >= 0.0f ? peripheralThrustOutput : powerBehaviour.getTargetThrust() * 1000.0f;
+            float baseThrustPn = peripheralThrustOutput >= 0.0f ? peripheralThrustOutput : (float) (powerBehaviour.getTargetThrust() * getThrustUnitsPerKn());
             baseThrustPn *= (float) calculateAtmosphericFactor();
             thrust = currentPower * baseThrustPn;
         }
@@ -142,7 +142,7 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
     @Override
     protected double getBaseThrust() {
         if (peripheralThrustOutput >= 0.0f) {
-            return peripheralThrustOutput / 1000.0f;
+            return (float) (peripheralThrustOutput / getThrustUnitsPerKn());
         }
         return powerBehaviour.getTargetThrust();
     }
@@ -150,7 +150,7 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
     @Override
     protected double getRawThrustCap() {
         if (peripheralThrustOutput >= 0.0f) {
-            return peripheralThrustOutput / 1000.0f;
+            return (float) (peripheralThrustOutput / getThrustUnitsPerKn());
         }
         return powerBehaviour.getTargetThrust();
     }
@@ -164,7 +164,7 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
         if (thrustOutputPn < 0.0f || Float.isNaN(thrustOutputPn)) {
             this.peripheralThrustOutput = -1.0f;
         } else {
-            float maxPn = (float) (PropulsionConfig.CREATIVE_VECTOR_THRUSTER_MAX_THRUST.get() * 1000.0d);
+            float maxPn = (float) (PropulsionConfig.CREATIVE_VECTOR_THRUSTER_MAX_THRUST.get() * getThrustUnitsPerKn());
             this.peripheralThrustOutput = Math.min(Math.max(0.0f, thrustOutputPn), maxPn);
         }
         updateThrust(getBlockState());
@@ -210,7 +210,7 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
         CreateLang.builder()
                 .add(Component.literal("  "))
                 .add(Component.translatable("createpropulsion.tooltip.thrust1").withStyle(ChatFormatting.GRAY))
-                .add(Component.literal(String.format(Locale.ROOT, "%.2f", this.getDisplayedThrustPnForTooltip() / PN_PER_DISPLAY_UNIT)).withStyle(ChatFormatting.AQUA))
+                .add(Component.literal(String.format(Locale.ROOT, "%.2f", this.getDisplayedThrustPnForTooltip() / getThrustUnitsPerKn())).withStyle(ChatFormatting.AQUA))
                 .add(Component.literal(" pN").withStyle(ChatFormatting.GRAY))
                 .forGoggles(tooltip);
 
@@ -257,7 +257,7 @@ public class CreativeVectorThrusterBlockEntity extends VectorThrusterBlockEntity
         if (compound.contains("PeripheralThrustOutput")) {
             peripheralThrustOutput = Math.max(-1.0f, compound.getFloat("PeripheralThrustOutput"));
             if (peripheralThrustOutput >= 0.0f) {
-                float maxPn = (float) (PropulsionConfig.CREATIVE_VECTOR_THRUSTER_MAX_THRUST.get() * 1000.0d);
+                float maxPn = (float) (PropulsionConfig.CREATIVE_VECTOR_THRUSTER_MAX_THRUST.get() * getThrustUnitsPerKn());
                 peripheralThrustOutput = Math.min(peripheralThrustOutput, maxPn);
             }
         }

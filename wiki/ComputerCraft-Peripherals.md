@@ -8,6 +8,8 @@ Create Propulsion registers these peripherals when **CC: Tweaked** is installed.
 
 ## Throttle control (all thrusters)
 
+All thrust readouts and thrust-derived physics use the shared `thrustUnitsPerKn` physics config value (default `1000`) so displayed values match assembled/physics behavior.
+
 While **any** computer is attached to a thruster peripheral:
 
 1. The block uses **peripheral throttle** (normalized `0.0 … 1.0`), driven by Lua (`setPower`, `setThrust`, etc.).
@@ -164,7 +166,7 @@ Separate peripheral implementation (`CreativeVectorThrusterPeripheral`): directi
 
 | Method | Returns | Notes |
 |--------|---------|--------|
-| `setThrustOutput(thrustOutputPn)` | — | Base thrust in **pN**. Clamped to the same maximum as the on-block scroll: `creativeVectorThrusterMaxThrust` (kN from config) × **1000**. Pass **`< 0`** (e.g. `-1`) to clear override and use scroll thrust again. |
+| `setThrustOutput(thrustOutputPn)` | — | Base thrust in **pN**. Clamped to the same maximum as the on-block scroll: `creativeVectorThrusterMaxThrust` (kN from config) × `thrustUnitsPerKn` (physics config, default `1000`). Pass **`< 0`** (e.g. `-1`) to clear override and use scroll thrust again. |
 | `clearThrustOutput()` | — | Same as `setThrustOutput(-1)` — removes Lua thrust override |
 | `getMaxThrustOutputPn()` | `number` | Max allowed `setThrustOutput` in pN from config |
 | `isCustomThrustOutputActive()` | `boolean` | `true` if a CC thrust override is active |

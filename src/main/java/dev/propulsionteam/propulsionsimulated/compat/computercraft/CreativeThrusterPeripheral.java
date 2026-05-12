@@ -1,4 +1,5 @@
 package dev.propulsionteam.propulsionsimulated.compat.computercraft;
+import dev.propulsionteam.propulsionsimulated.PropulsionConfig;
 import dev.propulsionteam.propulsionsimulated.content.thruster.AbstractThrusterBlockEntity.ControlMode;
 import dev.propulsionteam.propulsionsimulated.content.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
@@ -56,7 +57,7 @@ public class CreativeThrusterPeripheral extends SyncedPeripheral<CreativeThruste
 
     @LuaFunction
     public final float getTargetThrustKN() {
-        return getTargetThrustPN() / 1000.0f;
+        return (float) (getTargetThrustPN() / PropulsionConfig.getThrustUnitsPerKnOrDefault());
     }
 
     @LuaFunction
@@ -66,7 +67,7 @@ public class CreativeThrusterPeripheral extends SyncedPeripheral<CreativeThruste
 
     @LuaFunction
     public final double getCurrentThrustKN() {
-        return getCurrentThrustPN() / 1000.0d;
+        return getCurrentThrustPN() / PropulsionConfig.getThrustUnitsPerKnOrDefault();
     }
 
     @LuaFunction
@@ -76,7 +77,7 @@ public class CreativeThrusterPeripheral extends SyncedPeripheral<CreativeThruste
 
     @LuaFunction
     public final double getDisplayedThrustKN() {
-        return getDisplayedThrustPN() / 1000.0d;
+        return getDisplayedThrustPN() / PropulsionConfig.getThrustUnitsPerKnOrDefault();
     }
 
     @LuaFunction

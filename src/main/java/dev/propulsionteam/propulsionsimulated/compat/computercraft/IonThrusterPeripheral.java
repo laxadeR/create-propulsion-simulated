@@ -4,6 +4,7 @@ import com.simibubi.create.compat.computercraft.implementation.peripherals.Synce
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dev.propulsionteam.propulsionsimulated.PropulsionConfig;
 import dev.propulsionteam.propulsionsimulated.content.thruster.AbstractThrusterBlockEntity.ControlMode;
 import dev.propulsionteam.propulsionsimulated.content.thruster.ion_thruster.IonThrusterBlockEntity;
 import net.minecraft.util.Mth;
@@ -50,7 +51,7 @@ public class IonThrusterPeripheral extends SyncedPeripheral<IonThrusterBlockEnti
 
     @LuaFunction
     public final double getCurrentThrustKN() {
-        return getCurrentThrustPN() / 1000.0d;
+        return getCurrentThrustPN() / PropulsionConfig.getThrustUnitsPerKnOrDefault();
     }
 
     @LuaFunction
@@ -60,7 +61,7 @@ public class IonThrusterPeripheral extends SyncedPeripheral<IonThrusterBlockEnti
 
     @LuaFunction
     public final double getDisplayedThrustKN() {
-        return getDisplayedThrustPN() / 1000.0d;
+        return getDisplayedThrustPN() / PropulsionConfig.getThrustUnitsPerKnOrDefault();
     }
 
     @LuaFunction

@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 
+import dev.propulsionteam.propulsionsimulated.PropulsionConfig;
 import dev.propulsionteam.propulsionsimulated.content.thruster.AbstractThrusterBlockEntity.ControlMode;
 import dev.propulsionteam.propulsionsimulated.content.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
@@ -56,7 +57,7 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
 
     @LuaFunction
     public final double getCurrentThrustKN() {
-        return getCurrentThrustPN() / 1000.0d;
+        return getCurrentThrustPN() / PropulsionConfig.getThrustUnitsPerKnOrDefault();
     }
 
     @LuaFunction
@@ -66,7 +67,7 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
 
     @LuaFunction
     public final double getDisplayedThrustKN() {
-        return getDisplayedThrustPN() / 1000.0d;
+        return getDisplayedThrustPN() / PropulsionConfig.getThrustUnitsPerKnOrDefault();
     }
 
     @LuaFunction

@@ -29,6 +29,8 @@ public class PropulsionConfig {
     public static final ModConfigSpec.IntValue ION_THRUSTER_ENERGY_CAPACITY_FE;
     public static final ModConfigSpec.DoubleValue ION_THRUSTER_FE_PER_TICK_AT_FULL_THROTTLE;
     public static final ModConfigSpec.DoubleValue ION_THRUSTER_BASE_THRUST;
+    public static final ModConfigSpec.DoubleValue ION_MULTIBLOCK_2X_THRUST_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue ION_MULTIBLOCK_3X_THRUST_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue VECTOR_THRUSTER_BASE_THRUST;
     public static final ModConfigSpec.DoubleValue LIQUID_VECTOR_THRUSTER_BASE_THRUST;
     public static final ModConfigSpec.IntValue LIQUID_VECTOR_THRUSTER_FUEL_TANK_CAPACITY_MB;
@@ -43,6 +45,7 @@ public class PropulsionConfig {
     public static final ModConfigSpec.DoubleValue NOZZLE_OFFSET_FROM_CENTER;
     public static final ModConfigSpec.BooleanValue USE_ATMOSPHERIC_PRESSURE;
     public static final ModConfigSpec.DoubleValue ATMOSPHERIC_PRESSURE_AMOUNT;
+    public static final ModConfigSpec.DoubleValue THRUST_UNITS_PER_KN;
     public static final ModConfigSpec.IntValue CLIENT_PARTICLES_PER_TICK;
     public static final Map<String, ModConfigSpec.IntValue> FUEL_EFFICIENCY_ENTRIES = new LinkedHashMap<>();
     public static final Map<String, ModConfigSpec.IntValue> FUEL_BURN_RATE_ENTRIES = new LinkedHashMap<>();
@@ -74,8 +77,9 @@ public class PropulsionConfig {
         COMMON_BUILDER.push("thruster");
 
         BASE_THRUST = COMMON_BUILDER.comment("Base thrust at redstone 15 and full obstruction efficiency for the standard thruster.",
+                        "Default tuned for 1000-unit thrust scale parity with Sable physics.",
                         "Effective thrust uses: baseThrust * fuel_thrust_percent / 100.")
-                .defineInRange("baseThrust", 800.0d, 1.0d, 10000000.0d);
+                .defineInRange("baseThrust", 533.333333333d, 1.0d, 10000000.0d);
         OBSTRUCTION_SCAN_LENGTH = COMMON_BUILDER.comment("How many blocks behind the nozzle are checked for obstruction.")
                 .defineInRange("obstructionScanLength", 10, 1, 64);
         OBSTRUCTION_IGNORE_OTHER_SUBLEVELS = COMMON_BUILDER.comment(
@@ -98,24 +102,33 @@ public class PropulsionConfig {
                 .defineInRange("ionThrusterEnergyCapacityFe", 4000, 1, 100000000);
         ION_THRUSTER_FE_PER_TICK_AT_FULL_THROTTLE = COMMON_BUILDER.comment("Ion thruster energy consumption in FE per tick at full redstone throttle.")
                 .defineInRange("ionThrusterFePerTickAtFullThrottle", 40.0d, 0.0001d, 1000000.0d);
-        ION_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Ion thruster base thrust at redstone 15 and full obstruction efficiency.")
-                .defineInRange("ionThrusterBaseThrust", 1200.d, 1.d, 10000000.d);
+        ION_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Ion thruster base thrust at redstone 15 and full obstruction efficiency.",
+                "Default tuned for 1000-unit thrust scale parity with Sable physics.")
+                .defineInRange("ionThrusterBaseThrust", 800.d, 1.d, 10000000.d);
+        ION_MULTIBLOCK_2X_THRUST_MULTIPLIER = COMMON_BUILDER.comment("Ion thruster thrust multiplier for 2x2x2 multiblock (1.30 = +30%).")
+                .defineInRange("ionMultiblock2xThrustMultiplier", 1.30d, 0.01d, 10.0d);
+        ION_MULTIBLOCK_3X_THRUST_MULTIPLIER = COMMON_BUILDER.comment("Ion thruster thrust multiplier for 3x3x3 multiblock (1.40 = +40%).")
+                .defineInRange("ionMultiblock3xThrustMultiplier", 1.40d, 0.01d, 10.0d);
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.push("Creative Thruster");
-            CREATIVE_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Starting thrust value (kN) when a creative thruster is placed.")
-                .defineInRange("creativeThrusterBaseThrust", 1000.0d, 1.0d, 1000000.0d);
-            CREATIVE_THRUSTER_MAX_THRUST = COMMON_BUILDER.comment("Maximum thrust (kN) the scroll can reach on a creative thruster.")
-                .defineInRange("creativeThrusterMaxThrust", 10000.0d, 10.0d, 1000000.0d);
+            CREATIVE_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Starting thrust value (kN) when a creative thruster is placed.",
+                "Default tuned for 1000-unit thrust scale parity with Sable physics.")
+                .defineInRange("creativeThrusterBaseThrust", 666.666666667d, 1.0d, 1000000.0d);
+            CREATIVE_THRUSTER_MAX_THRUST = COMMON_BUILDER.comment("Maximum thrust (kN) the scroll can reach on a creative thruster.",
+                "Default tuned for 1000-unit thrust scale parity with Sable physics.")
+                .defineInRange("creativeThrusterMaxThrust", 6666.666666667d, 10.0d, 1000000.0d);
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.push("vectorThruster");
-            VECTOR_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Vector thruster base thrust at redstone 15 and full obstruction efficiency.")
-                .defineInRange("vectorThrusterBaseThrust", 1100.0d, 1.0d, 10000000.0d);
+            VECTOR_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Vector thruster base thrust at redstone 15 and full obstruction efficiency.",
+                "Default tuned for 1000-unit thrust scale parity with Sable physics.")
+                .defineInRange("vectorThrusterBaseThrust", 733.333333333d, 1.0d, 10000000.0d);
         COMMON_BUILDER.pop();
         COMMON_BUILDER.push("liquidVectorThruster");
-            LIQUID_VECTOR_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Liquid vector thruster base thrust at redstone 15 and full obstruction efficiency.")
-                .defineInRange("liquidVectorThrusterBaseThrust", 1100.0d, 1.0d, 10000000.0d);
+            LIQUID_VECTOR_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Liquid vector thruster base thrust at redstone 15 and full obstruction efficiency.",
+                "Default tuned for 1000-unit thrust scale parity with Sable physics.")
+                .defineInRange("liquidVectorThrusterBaseThrust", 733.333333333d, 1.0d, 10000000.0d);
             LIQUID_VECTOR_THRUSTER_FUEL_TANK_CAPACITY_MB = COMMON_BUILDER.comment("Liquid vector thruster internal fuel tank capacity in millibuckets.")
                 .defineInRange("liquidVectorThrusterFuelTankCapacityMb", 1000, 250, 10000000);
             LIQUID_VECTOR_THRUSTER_FUEL_MB_PER_TICK_AT_FULL_THROTTLE = COMMON_BUILDER.comment("Liquid vector thruster fuel consumption in millibuckets per tick at full redstone throttle.")
@@ -138,10 +151,12 @@ public class PropulsionConfig {
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.push("creativeVectorThruster");
-            CREATIVE_VECTOR_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Starting thrust value (kN) when a creative vector thruster is placed.")
-                .defineInRange("creativeVectorThrusterBaseThrust", 1000.0d, 1.0d, 1000000.0d);
-            CREATIVE_VECTOR_THRUSTER_MAX_THRUST = COMMON_BUILDER.comment("Maximum thrust (kN) the scroll can reach on a creative vector thruster.")
-                .defineInRange("creativeVectorThrusterMaxThrust", 10000.0d, 10.0d, 1000000.0d);
+            CREATIVE_VECTOR_THRUSTER_BASE_THRUST = COMMON_BUILDER.comment("Starting thrust value (kN) when a creative vector thruster is placed.",
+                "Default tuned for 1000-unit thrust scale parity with Sable physics.")
+                .defineInRange("creativeVectorThrusterBaseThrust", 666.666666667d, 1.0d, 1000000.0d);
+            CREATIVE_VECTOR_THRUSTER_MAX_THRUST = COMMON_BUILDER.comment("Maximum thrust (kN) the scroll can reach on a creative vector thruster.",
+                "Default tuned for 1000-unit thrust scale parity with Sable physics.")
+                .defineInRange("creativeVectorThrusterMaxThrust", 6666.666666667d, 10.0d, 1000000.0d);
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.push("physics");
@@ -151,6 +166,10 @@ public class PropulsionConfig {
                 .define("useAtmosphericPressure", false);
             ATMOSPHERIC_PRESSURE_AMOUNT = COMMON_BUILDER.comment("Strength of atmospheric pressure influence. 1.0 = full effect, 0.0 = no effect.")
                 .defineInRange("atmosphericPressureAmount", 1.0d, 0.0d, 2.0d);
+            THRUST_UNITS_PER_KN = COMMON_BUILDER.comment(
+                    "Shared thrust unit scale: how many internal thrust units correspond to 1 kN.",
+                    "Used by physics conversion, tooltip display, and ComputerCraft kN helpers.")
+                .defineInRange("thrustUnitsPerKn", 1000.0d, 1.0d, 1000000.0d);
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.push("Stirling Engine");
@@ -428,6 +447,14 @@ public class PropulsionConfig {
             return LIQUID_VECTOR_THRUSTER_FUEL_MB_PER_TICK_AT_FULL_THROTTLE.get();
         } catch (IllegalStateException ignored) {
             return FUEL_MB_PER_TICK_AT_FULL_THROTTLE.get();
+        }
+    }
+
+    public static double getThrustUnitsPerKnOrDefault() {
+        try {
+            return THRUST_UNITS_PER_KN.get();
+        } catch (IllegalStateException ignored) {
+            return 1000.0d;
         }
     }
 

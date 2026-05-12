@@ -33,7 +33,7 @@ public class CreativeVectorThrusterPeripheral extends VectorThrusterPeripheral {
     /** Maximum base thrust in pN allowed by config (same cap as the scroll). */
     @LuaFunction
     public final double getMaxThrustOutputPn() {
-        return PropulsionConfig.CREATIVE_VECTOR_THRUSTER_MAX_THRUST.get() * 1000.0d;
+        return PropulsionConfig.CREATIVE_VECTOR_THRUSTER_MAX_THRUST.get() * PropulsionConfig.getThrustUnitsPerKnOrDefault();
     }
 
     @LuaFunction
