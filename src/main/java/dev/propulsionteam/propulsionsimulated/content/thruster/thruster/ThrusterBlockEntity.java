@@ -385,6 +385,8 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     protected void updateSingleThrust(BlockState currentBlockState) {
+        final double prevConsumedMbPerTick = lastConsumedMbPerTick;
+        final int prevFuelAmount = tank != null ? tank.getPrimaryHandler().getFluidAmount() : 0;
         float thrust = 0;
         float currentPower = getPower();
         lastConsumedMbPerTick = 0.0d;
@@ -415,6 +417,10 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             }
         }
         setThrustAndSync(thrust);
+        if (didSingleTooltipTelemetryChange(prevConsumedMbPerTick, prevFuelAmount)) {
+            setChanged();
+            notifyUpdate();
+        }
         isThrustDirty = false;
     }
 
@@ -428,6 +434,10 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     protected void updateMultiThrust(BlockState currentBlockState) {
+        final double prevConsumedMbPerTick = lastConsumedMbPerTick;
+        final double prevOxidizerConsumedMbPerTick = lastOxidizerConsumedMbPerTick;
+        final int prevFuelAmount = tank != null ? tank.getPrimaryHandler().getFluidAmount() : 0;
+        final int prevOxidizerAmount = oxidizerTank != null ? oxidizerTank.getPrimaryHandler().getFluidAmount() : 0;
         int n = width * width * width;
         float totalThrust = 0;
         float currentPower = getPower();
@@ -473,7 +483,8 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                     float fuelEfficiency = ThrusterFuelManager.getEfficiency(fluidStack().getFluid());
                     float baseThrustPn = (float) (getBaseThrust() * getThrustUnitsPerKn());
                     baseThrustPn *= (float) calculateAtmosphericFactor();
-                    totalThrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * fuelEfficiency * fuelRatio * n * getMultiblockThrustMultiplier(width);
+                    float oxidizerThrustMultiplier = canUseOxidizer ? getMultiblockOxidizerThrustMultiplier(width) : 1.0f;
+                    totalThrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * fuelEfficiency * fuelRatio * n * getMultiblockThrustMultiplier(width) * oxidizerThrustMultiplier;
                     lastConsumedMbPerTick = (double) fuelActual / (double) tickRate;
                 }
             }
@@ -481,6 +492,10 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
         // Controller holds the total thrust; non-members get 0 so they skip physics and sound.
         setThrustAndSync(totalThrust);
+        if (didMultiTooltipTelemetryChange(prevConsumedMbPerTick, prevOxidizerConsumedMbPerTick, prevFuelAmount, prevOxidizerAmount)) {
+            setChanged();
+            notifyUpdate();
+        }
         BlockPos origin = worldPosition;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < width; y++) {
@@ -497,6 +512,30 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             }
         }
         isThrustDirty = false;
+    }
+
+    private boolean didSingleTooltipTelemetryChange(double prevConsumedMbPerTick, int prevFuelAmount) {
+        if (java.lang.Math.abs(lastConsumedMbPerTick - prevConsumedMbPerTick) > 1e-4d) {
+            return true;
+        }
+        int fuelAmountNow = tank != null ? tank.getPrimaryHandler().getFluidAmount() : 0;
+        return fuelAmountNow != prevFuelAmount;
+    }
+
+    private boolean didMultiTooltipTelemetryChange(double prevConsumedMbPerTick, double prevOxidizerConsumedMbPerTick,
+                                                   int prevFuelAmount, int prevOxidizerAmount) {
+        if (java.lang.Math.abs(lastConsumedMbPerTick - prevConsumedMbPerTick) > 1e-4d) {
+            return true;
+        }
+        if (java.lang.Math.abs(lastOxidizerConsumedMbPerTick - prevOxidizerConsumedMbPerTick) > 1e-4d) {
+            return true;
+        }
+        int fuelAmountNow = tank != null ? tank.getPrimaryHandler().getFluidAmount() : 0;
+        if (fuelAmountNow != prevFuelAmount) {
+            return true;
+        }
+        int oxidizerAmountNow = oxidizerTank != null ? oxidizerTank.getPrimaryHandler().getFluidAmount() : 0;
+        return oxidizerAmountNow != prevOxidizerAmount;
     }
 
     @Override
@@ -621,6 +660,12 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
         if (cubeWidth == 2) return PropulsionConfig.MULTIBLOCK_2X_THRUST_MULTIPLIER.get().floatValue();
         if (cubeWidth == 3) return PropulsionConfig.MULTIBLOCK_3X_THRUST_MULTIPLIER.get().floatValue();
         return 1.0f;
+    }
+
+    private static float getMultiblockOxidizerThrustMultiplier(int cubeWidth) {
+        float oxidizerEfficiency = getMultiblockOxidizerEfficiency(cubeWidth);
+        if (oxidizerEfficiency <= 0.0f) return 1.0f;
+        return 1.0f / oxidizerEfficiency;
     }
 
     @Override
@@ -902,6 +947,19 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                         .add(Component.literal("Oxidizer Bonus: ").withStyle(ChatFormatting.GRAY))
                         .add(hasOx
                             ? Component.literal("-" + oxSavePct + "%").withStyle(ChatFormatting.AQUA)
+                            : Component.translatable("createpropulsion.gui.goggles.thruster.bulk_bonus_inactive").withStyle(ChatFormatting.RED))
+                        .forGoggles(tooltip);
+                }
+
+                float oxThrustMultiplier = getMultiblockOxidizerThrustMultiplier(ctrl.width);
+                int thrustBonusPct = java.lang.Math.round((oxThrustMultiplier - 1.0f) * 100.0f);
+                if (thrustBonusPct > 0) {
+                    CreateLang.builder()
+                        .add(Component.literal("  "))
+                        .add(Component.translatable("createpropulsion.gui.goggles.thruster.thrust_bonus").withStyle(ChatFormatting.GRAY))
+                        .add(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                        .add(hasOx
+                            ? Component.literal("+" + thrustBonusPct + "%").withStyle(ChatFormatting.AQUA)
                             : Component.translatable("createpropulsion.gui.goggles.thruster.bulk_bonus_inactive").withStyle(ChatFormatting.RED))
                         .forGoggles(tooltip);
                 }
