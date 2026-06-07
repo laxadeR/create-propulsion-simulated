@@ -115,7 +115,11 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
         ParseResult parseResult = parseFuelProperties(cachedThrusterFuelDatapack);
         fuelPropertiesMap = parseResult.fuelMap();
         // Add fuels from config that might not be in datapacks
-        ConfigMergeStats mergeStats = mergeConfigProperties(fuelPropertiesMap);
+
+        // <BSoD (laxadeR)>: Why would you ever want to have both config and datapacks for fuels??
+        //ConfigMergeStats mergeStats = mergeConfigProperties(fuelPropertiesMap);
+        ConfigMergeStats mergeStats = new ConfigMergeStats(0, 0, 0);
+
         logReloadSummary("datapack_reload", parseResult, mergeStats);
         profiler.pop();
         //Update clients (happens only on /reload as on server start server instance is still null)
@@ -203,7 +207,11 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
         }
         ParseResult parseResult = parseFuelProperties(cachedThrusterFuelDatapack);
         fuelPropertiesMap = parseResult.fuelMap();
-        ConfigMergeStats mergeStats = mergeConfigProperties(fuelPropertiesMap);
+
+        // <BSoD (laxadeR)>: not using config anymore
+        //ConfigMergeStats mergeStats = mergeConfigProperties(fuelPropertiesMap);
+        ConfigMergeStats mergeStats = new ConfigMergeStats(0, 0, 0);
+
         logReloadSummary("common_config_reload", parseResult, mergeStats);
         syncFuelDataToClients();
     }
