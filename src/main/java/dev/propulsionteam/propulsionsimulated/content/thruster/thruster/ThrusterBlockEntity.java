@@ -294,6 +294,12 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             controller.tank.getPrimaryHandler().setFluid(trimToCapacity(totalFuel, newCap));
         }
 
+        if (controller.oxidizerTank != null) {
+            controller.oxidizerTank.getPrimaryHandler()
+                    .setCapacity(newCap)
+                    .setFluid(FluidStack.EMPTY);
+        }
+
         for (ThrusterBlockEntity t : members) {
             t.controllerPos = (t == controller) ? null : origin;
             t.width = size;
@@ -323,6 +329,12 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             fuelPool = tank.getPrimaryHandler().getFluid().copy();
             tank.getPrimaryHandler().setFluid(FluidStack.EMPTY);
             tank.getPrimaryHandler().setCapacity(getBaseTankCapacityMb());
+        }
+
+        if (oxidizerTank != null) {
+            oxidizerTank.getPrimaryHandler()
+                    .setCapacity(getBaseTankCapacityMb())
+                    .setFluid(FluidStack.EMPTY);
         }
 
         for (int x = 0; x < size; x++) {
