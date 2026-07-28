@@ -63,14 +63,18 @@ public record SolidThrusterFuelDefinition(
         if (burnTicks.isPresent() && burnTicks.get() > 0) {
             return burnTicks.get();
         }
-        int smelting = stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING);
-        if (smelting <= 0) {
-            smelting = 1600;
-        }
+
+        // <laxadeR> (BSoD): It's a solid rocket booster, why would it use burn times as if it's smelting??
+        //int smelting = stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING);
+        //if (smelting <= 0) {
+        //    smelting = 1600;
+        //}
         float multiplier = consumptionMultiplier;
         if (multiplier <= 0) {
             multiplier = 1.0f;
         }
-        return Math.max(1, Math.round(smelting / multiplier));
+        //return Math.max(1, Math.round(smelting / multiplier));
+
+        return Math.max(1, Math.round(1600 / multiplier));
     }
 }

@@ -185,9 +185,8 @@ public class SolidFuelThrusterBlockEntity extends AbstractThrusterBlockEntity im
         if (stack.isEmpty()) {
             return false;
         }
-        return SolidThrusterFuelManager.getProperties(stack) != null
-                || SolidFuelThrusterFuelHelper.isSuperheatedFuel(stack)
-                || SolidFuelThrusterFuelHelper.isCreativeBlazeCake(stack);
+
+        return SolidThrusterFuelManager.getProperties(stack) != null;
     }
 
     public ItemStack getFuelStack() {

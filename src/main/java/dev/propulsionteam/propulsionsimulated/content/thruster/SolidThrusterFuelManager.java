@@ -308,8 +308,11 @@ public class SolidThrusterFuelManager extends SimpleJsonResourceReloadListener {
         if (def != null) {
             return def.resolveBurnTicks(stack);
         }
-        int smelting = stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING);
-        return Math.max(1, smelting > 0 ? smelting : 1600);
+
+        // <laxadeR> (BSoD): Why???? Why not just use the datapack???
+        // int smelting = stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING);
+        // return Math.max(1, smelting > 0 ? smelting : 1600);
+        return 0;
     }
 
     private static void syncToClients() {
