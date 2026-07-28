@@ -35,7 +35,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static final String DIRECTORY = "thruster_fuels";
-    private static final Set<ResourceLocation> EMPTY_SET = new HashSet<>();
+    public static final Set<ResourceLocation> EMPTY_SET = new HashSet<>();
 
     private static Map<Fluid, FluidThrusterProperties> fuelPropertiesMap = new HashMap<>();
 
