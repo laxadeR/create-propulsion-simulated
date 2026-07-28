@@ -502,10 +502,9 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                     float consumptionRatio = consumption > 0
                         ? (float) fuelConsumed / (float) consumption
                         : 1.0f;
-                    float fuelEfficiency = ThrusterFuelManager.getEfficiency(fluidStack().getFluid());
                     float baseThrustPn = (float) (getBaseThrust() * getThrustUnitsPerKn());
                     baseThrustPn *= (float) calculateAtmosphericFactor();
-                    thrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * fuelEfficiency * consumptionRatio;
+                    thrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * consumptionRatio;
                     lastConsumedMbPerTick = (double) fuelConsumed / (double) tickRate;
                 }
             }
@@ -573,11 +572,10 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
                         lastOxidizerConsumedMbPerTick = (double) oxToDrain / (double) tickRate;
                     }
 
-                    float fuelEfficiency = ThrusterFuelManager.getEfficiency(fluidStack().getFluid());
                     float baseThrustPn = (float) (getBaseThrust() * getThrustUnitsPerKn());
                     baseThrustPn *= (float) calculateAtmosphericFactor();
                     float oxidizerThrustMultiplier = canUseOxidizer ? getMultiblockOxidizerThrustMultiplier(width) : 1.0f;
-                    totalThrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * fuelEfficiency * fuelRatio * n * getMultiblockThrustMultiplier(width) * oxidizerThrustMultiplier;
+                    totalThrust = baseThrustPn * thrustPercentage * properties.thrustMultiplier() * fuelRatio * n * getMultiblockThrustMultiplier(width) * oxidizerThrustMultiplier;
                     lastConsumedMbPerTick = (double) fuelActual / (double) tickRate;
                 }
             }
@@ -1225,13 +1223,6 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
             .add(Component.literal(String.format(Locale.ROOT, "%.1f", consumptionRate)).withStyle(ChatFormatting.AQUA))
             .add(Component.literal(" mB/t").withStyle(ChatFormatting.GRAY))
             .forGoggles(tooltip);
-    }
-    protected float getFuelEfficiencyMultiplier() {
-        FluidStack currentFluid = fluidStack();
-        if (currentFluid.isEmpty()) {
-            return 1.0f;
-        }
-        return ThrusterFuelManager.getEfficiency(currentFluid.getFluid());
     }
 
     public FluidStack fluidStack() {
